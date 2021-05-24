@@ -1,5 +1,8 @@
 # iOS compatible plist serialization and deserialization library for Dart
 
+This library is open source (BSD) and well tested. Development occurs on [GitHub](https://github.com/electricbolt/dart-propertylistserialization).
+Package is hosted on dart [packages](https://pub.dev/packages/propertylistserialization).
+
 ## Features
 
 ### Binary plist
