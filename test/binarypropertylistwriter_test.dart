@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:PropertyListSerialization/propertylistserialization.dart';
-import 'package:PropertyListSerialization/src/binarypropertylistreader.dart';
-import 'package:PropertyListSerialization/src/binarypropertylistwriter.dart';
+import 'package:propertylistserialization/propertylistserialization.dart';
+import 'package:propertylistserialization/src/binarypropertylistreader.dart';
+import 'package:propertylistserialization/src/binarypropertylistwriter.dart';
 import 'package:test/test.dart';
 
 import 'binarypropertylistreader_test.dart';

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:PropertyListSerialization/src/binarypropertylistreader.dart';
+import 'package:propertylistserialization/src/binarypropertylistreader.dart';
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 

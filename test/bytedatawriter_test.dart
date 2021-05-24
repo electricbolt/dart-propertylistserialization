@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:PropertyListSerialization/src/bytedatawriter.dart';
+import 'package:propertylistserialization/src/bytedatawriter.dart';
 
 void main() {
 

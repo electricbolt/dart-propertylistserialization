@@ -2,11 +2,10 @@
 // PropertyListSerialization Copyright © 2021; Electric Bolt Limited.
 
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:typed_data';
 import '../propertylistserialization.dart';
 import 'dateutil.dart';
-import 'package:PropertyListSerialization/src/bytedatawriter.dart';
+import 'bytedatawriter.dart';
 
 /// Property list elements are written as follows:
 ///

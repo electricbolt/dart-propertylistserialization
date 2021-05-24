@@ -3,8 +3,8 @@
 
 import 'dart:typed_data';
 
-import 'package:PropertyListSerialization/src/binarypropertylistreader.dart';
-import 'package:PropertyListSerialization/src/binarypropertylistwriter.dart';
+import 'src/binarypropertylistreader.dart';
+import 'src/binarypropertylistwriter.dart';
 
 import 'exceptions.dart';
 

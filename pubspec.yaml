@@ -1,4 +1,4 @@
-name: PropertyListSerialization
+name: propertylistserialization
 description: iOS compatible plist serialization and deserialization library for Dart.
 version: 1.0.0
 homepage: https://github.com/electricbolt/dartpropertylistserialization

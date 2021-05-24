@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:PropertyListSerialization/src/dateutil.dart';
+import 'package:propertylistserialization/src/dateutil.dart';
 
 void main() {
   test('parseBinary', () {

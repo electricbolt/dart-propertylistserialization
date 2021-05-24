@@ -1,6 +1,5 @@
-import 'package:PropertyListSerialization/propertylistserialization.dart';
+import 'package:propertylistserialization/propertylistserialization.dart';
 import 'package:test/test.dart';
-import 'package:PropertyListSerialization/src/dateutil.dart';
 
 import 'binarypropertylistreader_test.dart';
 
