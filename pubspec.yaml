@@ -6,11 +6,10 @@ homepage: https://github.com/electricbolt/dartpropertylistserialization
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
-#dependencies:
-#  path: ^1.7.0
+dependencies:
+  convert: ^3.0.0
+  xml: ^5.1.1
 
 dev_dependencies:
   pedantic: ^1.9.0
   test: ^1.17.3
-  convert: ^3.0.0
-  xml: ^5.1.1
