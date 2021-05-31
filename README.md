@@ -57,7 +57,7 @@ try {
 
 #### Result
 
-```plist
+```
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -110,7 +110,7 @@ try {
 
 #### Result
 
-```text
+```
 62 70 6c 69 73 74 30 30 a1 01 d3 02 03 04 05 06
 07 58 49 63 6f 6e 4e 61 6d 65 58 49 63 6f 6e 53
 69 7a 65 58 53 65 6c 65 63 74 65 64 5d 6c 61 72
