@@ -1,3 +1,6 @@
+// binarypropertylistreader_test.dart
+// PropertyListSerialization Copyright © 2021; Electric Bolt Limited.
+
 import 'dart:typed_data';
 
 import 'package:propertylistserialization/src/binarypropertylistreader.dart';
@@ -5,108 +8,115 @@ import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('array', () {
+    test('emptyArray', () {
+      var template = '62706c6973743030a0080000000000000101000000000000000100000'
+          '000000000000000000000000009';
+      var p = BinaryPropertyListReader(bytes(template));
+      var o = p.parse();
+      expect(o.runtimeType, <Object>[].runtimeType);
+      var list = o as List<Object>;
+      expect(list.length, equals(0));
+    });
 
-  // Array
-
-  test('emptyArray', () {
-    var template = '62706c6973743030a008000000000000010100000000000000010000000'
-        '0000000000000000000000009';
-    var p = BinaryPropertyListReader(bytes(template));
-    var o = p.parse();
-    expect(o.runtimeType, <Object>[].runtimeType);
-    var list = o as List<Object>;
-    expect(list.length, 0);
+    test('filledArray', () {
+      var template = '62706c6973743030aa0102030405060708090a1000223fc0000023400'
+          '400000000000009084500010203044f1014000102030405060708090a0b0c0d0e0f1'
+          '011121333c1e9fc3af0e000005f101b54686520636f77206a756d706564206f76657'
+          '22074686520646f676f101f0100010100540068006500200063006f00770020006a0'
+          '075006d0070006500640020006f007600650072002000740068006500200064006f0'
+          '067010201030813151a2324252b424b690000000000000101000000000000000b000'
+          '000000000000000000000000000aa';
+      var p = BinaryPropertyListReader(bytes(template));
+      var o = p.parse();
+      expect(o.runtimeType, <Object>[].runtimeType);
+      var list = o as List<Object>;
+      expect(list.length, equals(10));
+      expect(list[0], equals(0));
+      expect(list[1], equals(1.5));
+      expect(list[2], equals(2.5));
+      expect(list[3], equals(true));
+      expect(list[4], equals(false));
+      expectByteData(list[5] as ByteData, makeData(5));
+      expectByteData(list[6] as ByteData, makeData(20));
+      expect(
+          list[7], equals(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13)));
+      expect(list[8], equals('The cow jumped over the dog'));
+      expect(list[9], equals('\u0100\u0101The cow jumped over the dog\u0102'
+          '\u0103'));
+    });
   });
 
-  test('filledArray', () {
-    var template = '62706c6973743030aa0102030405060708090a1000223fc000002340040'
-        '0000000000009084500010203044f1014000102030405060708090a0b0c0d0e0f10111'
-        '21333c1e9fc3af0e000005f101b54686520636f77206a756d706564206f76657220746'
-        '86520646f676f101f0100010100540068006500200063006f00770020006a0075006d0'
-        '070006500640020006f007600650072002000740068006500200064006f00670102010'
-        '30813151a2324252b424b690000000000000101000000000000000b000000000000000'
-        '000000000000000aa';
-    var p = BinaryPropertyListReader(bytes(template));
-    var o = p.parse();
-    expect(o.runtimeType, <Object>[].runtimeType);
-    var list = o as List<Object>;
-    expect(list.length, 10);
-    expect(list[0], 0);
-    expect(list[1], 1.5);
-    expect(list[2], 2.5);
-    expect(list[3], true);
-    expect(list[4], false);
-    expectByteData(list[5] as ByteData, makeData(5));
-    expectByteData(list[6] as ByteData, makeData(20));
-    expect(list[7], DateTime.utc(1890, DateTime.june, 25, 06, 45, 13));
-    expect(list[8], 'The cow jumped over the dog');
-    expect(list[9], '\u0100\u0101The cow jumped over the dog\u0102\u0103');
+  group('dict', () {
+    test('emptyDict', () {
+      var template = '62706c6973743030d0080000000000000101000000000000000100000'
+          '000000000000000000000000009';
+      var p = BinaryPropertyListReader(bytes(template));
+      var o = p.parse();
+      expect(o.runtimeType, <String, Object>{}.runtimeType);
+      var dict = o as Map<String, Object>;
+      expect(dict.length, equals(0));
+    });
+
+    test('filledDict', () {
+      var template = '62706c6973743030da0102030405060708090a0b0c0d0e0f101112131'
+          '45664617461323056646f75626c6553696e745566616c73655575746631365464617'
+          '465547472756555666c6f61745564617461355561736369694f10140001020304050'
+          '60708090a0b0c0d0e0f101112132340040000000000001000086f101f01000101005'
+          '40068006500200063006f00770020006a0075006d0070006500640020006f0076006'
+          '50072002000740068006500200064006f00670102010333c1e9fc3af0e0000009223'
+          'fc000004500010203045f101b54686520636f77206a756d706564206f76657220746'
+          '86520646f67081d242b2f353b40454b51576e77797abbc4c5cad0000000000000010'
+          '10000000000000015000000000000000000000000000000ee';
+      var p = BinaryPropertyListReader(bytes(template));
+      var o = p.parse();
+      expect(o.runtimeType, <String, Object>{}.runtimeType);
+      var dict = o as Map<String, Object>;
+      expect(dict.length, equals(10));
+      expect(dict['int'], equals(0));
+      expect(dict['float'], equals(1.5));
+      expect(dict['double'], equals(2.5));
+      expect(dict['true'], equals(true));
+      expect(dict['false'], equals(false));
+      expectByteData(dict['data5'] as ByteData, makeData(5));
+      expectByteData(dict['data20'] as ByteData, makeData(20));
+      expect(dict['date'], equals(DateTime.utc(1890, DateTime.june, 25, 06, 45,
+          13)));
+      expect(dict['ascii'], equals('The cow jumped over the dog'));
+      expect(
+          dict['utf16'], equals('\u0100\u0101The cow jumped over the dog\u0102'
+          '\u0103'));
+    });
   });
 
-  // Dict
+  group('string', () {
+    test('asciiString', () {
+      expectString(
+          '', '62706c6973743030500800000000000001010000000000000001000000000000'
+          '00000000000000000009');
+      expectString(
+          ' ', '62706c697374303051200800000000000001010000000000000001000000000'
+          '0000000000000000000000a');
+      expectString(
+          'The dog jumped over the moon', '62706c69737430305f101c54686520646f67'
+          '206a756d706564206f76657220746865206d6f6f6e08000000000000010100000000'
+          '0000000100000000000000000000000000000027');
+    });
 
-  test('emptyDict', () {
-    var template = '62706c6973743030d008000000000000010100000000000000010000000'
-        '0000000000000000000000009';
-    var p = BinaryPropertyListReader(bytes(template));
-    var o = p.parse();
-    expect(o.runtimeType, <String, Object>{}.runtimeType);
-    var dict = o as Map<String, Object>;
-    expect(dict.length, 0);
+    test('unicodeString', () {
+      expectString(
+          'Ā', '62706c697374303061010008000000000000010100000000000000010000000'
+          '000000000000000000000000b');
+      expectString(
+          'Āā', '62706c69737430306201000101080000000000000101000000000000000100'
+          '00000000000000000000000000000d');
+      expectString(
+          'ĀāThe cow jumped over the dogĂă', '62706c69737430306f101f01000101005'
+          '40068006500200063006f00770020006a0075006d0070006500640020006f0076006'
+          '50072002000740068006500200064006f00670102010308000000000000010100000'
+          '0000000000100000000000000000000000000000049');
+    });
   });
-
-  test('filledDict', () {
-    var template = '62706c6973743030da0102030405060708090a0b0c0d0e0f10111213145'
-        '664617461323056646f75626c6553696e745566616c736555757466313654646174655'
-        '47472756555666c6f61745564617461355561736369694f10140001020304050607080'
-        '90a0b0c0d0e0f101112132340040000000000001000086f101f0100010100540068006'
-        '500200063006f00770020006a0075006d0070006500640020006f00760065007200200'
-        '0740068006500200064006f00670102010333c1e9fc3af0e0000009223fc0000045000'
-        '10203045f101b54686520636f77206a756d706564206f7665722074686520646f67081'
-        'd242b2f353b40454b51576e77797abbc4c5cad00000000000000101000000000000001'
-        '5000000000000000000000000000000ee';
-    var p = BinaryPropertyListReader(bytes(template));
-    var o = p.parse();
-    expect(o.runtimeType, <String, Object>{}.runtimeType);
-    var dict = o as Map<String, Object>;
-    expect(dict.length, 10);
-    expect(dict['int'], 0);
-    expect(dict['float'], 1.5);
-    expect(dict['double'], 2.5);
-    expect(dict['true'], true);
-    expect(dict['false'], false);
-    expectByteData(dict['data5'] as ByteData, makeData(5));
-    expectByteData(dict['data20'] as ByteData, makeData(20));
-    expect(dict['date'], DateTime.utc(1890, DateTime.june, 25, 06, 45, 13));
-    expect(dict['ascii'], 'The cow jumped over the dog');
-    expect(dict['utf16'], '\u0100\u0101The cow jumped over the dog\u0102'
-        '\u0103');
-  });
-
-  // String
-
-  test('asciiString', () {
-    expectString('', '62706c697374303050080000000000000101000000000000000100000'
-        '000000000000000000000000009');
-    expectString(' ', '62706c69737430305120080000000000000101000000000000000100'
-        '00000000000000000000000000000a');
-    expectString('The dog jumped over the moon','62706c69737430305f101c54686520'
-        '646f67206a756d706564206f76657220746865206d6f6f6e0800000000000001010000'
-        '00000000000100000000000000000000000000000027');
-  });
-
-  test('unicodeString', () {
-    expectString('Ā', '62706c69737430306101000800000000000001010000000000000001'
-        '0000000000000000000000000000000b');
-    expectString('Āā', '62706c6973743030620100010108000000000000010100000000000'
-        '000010000000000000000000000000000000d');
-    expectString('ĀāThe cow jumped over the dogĂă', '62706c69737430306f101f0100'
-        '010100540068006500200063006f00770020006a0075006d0070006500640020006f00'
-        '7600650072002000740068006500200064006f00670102010308000000000000010100'
-        '0000000000000100000000000000000000000000000049');
-  });
-
-  // int
 
   test('integer', () {
     // positive
@@ -188,8 +198,6 @@ void main() {
         '00000000000101000000000000000100000000000000000000000000000011');
   });
 
-  // Real
-
   test('float', () {
     expectDouble(0.0, '62706c69737430302200000000080000000000000101000000000000'
         '00010000000000000000000000000000000d');
@@ -226,16 +234,17 @@ void main() {
         '000000101000000000000000100000000000000000000000000000011');
   });
 
-  // boolean
+  group('boolean', () {
+    test('true', () {
+      expectBoolean(true, '62706c6973743030090800000000000001010000000000000001'
+          '00000000000000000000000000000009');
+    });
 
-  test('true', () {
-    expectBoolean(true, '62706c697374303009080000000000000101000000000000000100'
-        '000000000000000000000000000009');
-  });
-
-  test('false', () {
-    expectBoolean(false, '62706c69737430300808000000000000010100000000000000010'
-        '0000000000000000000000000000009');
+    test('false', () {
+      expectBoolean(
+          false, '62706c6973743030080800000000000001010000000000000001000000000'
+          '00000000000000000000009');
+    });
   });
 
   // Date
@@ -334,9 +343,9 @@ ByteData makeData(int len) {
 /// Compares [actual] and [matcher] ByteData's for exact size and contents.
 
 void expectByteData(ByteData actual, ByteData matcher) {
-  expect(actual.lengthInBytes, matcher.lengthInBytes);
+  expect(actual.lengthInBytes, equals(matcher.lengthInBytes));
   for (var i = 0; i < actual.lengthInBytes; i++) {
-    expect(actual.getUint8(i), matcher.getUint8(i));
+    expect(actual.getUint8(i), equals(matcher.getUint8(i)));
   }
 }
 
@@ -348,7 +357,7 @@ void expectString(String matcher, String template) {
   var o = p.parse();
   expect(true, o.runtimeType == String);
   var s = o as String;
-  expect(s, matcher);
+  expect(s, equals(matcher));
 }
 
 /// Decodes the plist hex encoded string [template] and compares the resulting
@@ -359,7 +368,7 @@ void expectInteger(int matcher, String template) {
   var o = p.parse();
   expect(true, o.runtimeType == int);
   var i = o as int;
-  expect(i, matcher);
+  expect(i, equals(matcher));
 }
 
 /// Decodes the plist hex encoded string [template] and compares the resulting
@@ -370,7 +379,7 @@ void expectDouble(double matcher, String template) {
   var o = p.parse();
   expect(true, o.runtimeType == double);
   var d = o as double;
-  expect(d, matcher);
+  expect(d, equals(matcher));
 }
 
 /// Decodes the plist hex encoded string [template] and compares the resulting

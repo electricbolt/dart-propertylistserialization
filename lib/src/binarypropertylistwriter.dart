@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import '../propertylistserialization.dart';
 import 'dateutil.dart';
 import 'bytedatawriter.dart';
+import 'package:convert/convert.dart';
 
 /// Property list elements are written as follows:
 ///
@@ -20,17 +21,21 @@ import 'bytedatawriter.dart';
 /// Dart false -> false (BOOL)
 /// ByteData -> data (NSData)
 
-/// Represents a 32-bit 'float' type.
-
 class BinaryPropertyListWriter {
 
   final Object _rootObj;
   final Map<Object, int> _objectIdMap;
   late int _objectRefSize;
   final ByteDataWriter _os;
+  final Map<int, IntegerWrapper> _integerWrapperMap;
+  final Map<double, DoubleWrapper> _doubleWrapperMap;
+  final Map<ByteDataWrapper, ByteDataWrapper> _byteDataWrapperMap;
 
   BinaryPropertyListWriter(Object rootObj)
-      : _rootObj = rootObj, _objectIdMap = <Object, int>{}, _os = ByteDataWriter();
+      : _rootObj = rootObj, _objectIdMap = <Object, int>{},
+        _os = ByteDataWriter(), _integerWrapperMap = <int, IntegerWrapper>{},
+        _doubleWrapperMap = <double, DoubleWrapper>{}, _byteDataWrapperMap =
+        <ByteDataWrapper, ByteDataWrapper>{};
 
   ByteData write() {
     // CFBinaryPlistHeader
@@ -52,19 +57,22 @@ class BinaryPropertyListWriter {
     // Write objects and save each byte offset into offsetTable
     for (var entry in _objectIdMap.entries) {
       offsetTable[entry.value] = _os.length;
-      var obj = entry.key;
+      var obj = _readMap(entry.key);
 
       if (obj is Map) {
         _writeLength(0xD, obj.length);
         for (var entry in obj.entries) {
-          _writeLong(_objectIdMap[entry.key]!, _objectRefSize);
+          var key = _readMap(entry.key);
+          _writeLong(_objectIdMap[key]!, _objectRefSize);
         }
         for (var entry in obj.entries) {
-          _writeLong(_objectIdMap[entry.value]!, _objectRefSize);
+          var value = _readMap(entry.value);
+          _writeLong(_objectIdMap[value]!, _objectRefSize);
         }
       } else if (obj is List) {
         _writeLength(0xA, obj.length);
-        for (var value in obj) {
+        for (var i = 0; i < obj.length; i++) {
+          var value = _readMap(obj[i]);
           _writeLong(_objectIdMap[value]!, _objectRefSize);
         }
       } else if (obj is String) {
@@ -96,30 +104,30 @@ class BinaryPropertyListWriter {
       } else if (obj is Float32) {
         _os.writeUint8(0x22);
         _os.writeFloat32(obj.value);
-      } else if (obj is double) {
+      } else if (obj is DoubleWrapper) {
         _os.writeUint8(0x23);
-        _os.writeFloat64(obj);
-      } else if (obj is int) {
-        if (obj < 0) {
+        _os.writeFloat64(obj.value);
+      } else if (obj is IntegerWrapper) {
+        if (obj.value < 0) {
           // All negative integers are stored as a long
           _os.writeUint8(0x13);
-          _os.writeInt64(obj);
-        } else if (obj < 256) {
+          _os.writeInt64(obj.value);
+        } else if (obj.value < 256) {
           // byte
           _os.writeUint8(0x10);
-          _os.writeInt8(obj);
-        } else if (obj < 65536) {
+          _os.writeInt8(obj.value);
+        } else if (obj.value < 65536) {
           // short
           _os.writeUint8(0x11);
-          _os.writeInt16(obj);
-        } else if (obj < 4294967296) {
+          _os.writeInt16(obj.value);
+        } else if (obj.value < 4294967296) {
           // int
           _os.writeUint8(0x12);
-          _os.writeInt32(obj);
+          _os.writeInt32(obj.value);
         } else {
           // long
           _os.writeUint8(0x13);
-          _os.writeInt64(obj);
+          _os.writeInt64(obj.value);
         }
       } else if (obj is DateTime) {
         _os.writeUint8(0x33);
@@ -130,9 +138,9 @@ class BinaryPropertyListWriter {
         } else {
           _os.writeUint8(0x09);
         }
-      } else if (obj is ByteData) {
-        _writeLength(0x4, obj.lengthInBytes);
-        _os.writeByteData(obj);
+      } else if (obj is ByteDataWrapper) {
+        _writeLength(0x4, obj.value.lengthInBytes);
+        _os.writeByteData(obj.value);
       }
     }
 
@@ -153,7 +161,7 @@ class BinaryPropertyListWriter {
     _os.writeUint8(offsetIntSize);
     _os.writeUint8(_objectRefSize);
     _os.writeUint64(_objectIdMap.length);
-    _os.writeUint64(_objectIdMap[_rootObj]!);
+    _os.writeUint64(_objectIdMap[_readMap(_rootObj)]!);
     _os.writeUint64(offsetTableOffset);
 
     return _os.toByteData();
@@ -175,6 +183,7 @@ class BinaryPropertyListWriter {
   /// For each unique object, assigns an object id.
 
   void _mapObject(Object obj) {
+    obj = _wrapMap(obj);
     if (!_objectIdMap.containsKey(obj)) {
       _objectIdMap[obj] = _objectIdMap.length;
     }
@@ -189,11 +198,71 @@ class BinaryPropertyListWriter {
       for (var entry in obj) {
         _mapObject(entry);
       }
-    } else if (obj is String || obj is int || obj is Float32 || obj is double
-        || obj is ByteData || obj is DateTime || obj is bool) {
+    } else if (obj is String || obj is IntegerWrapper || obj is Float32 ||
+        obj is DoubleWrapper || obj is ByteDataWrapper || obj is DateTime ||
+        obj is bool) {
       // do nothing.
     } else {
       throw StateError('Incompatible object $obj found');
+    }
+  }
+
+  /// If the [obj]ect provided is a num of type int, then returns an
+  /// IntegerWrapper. If the [obj]ect provided is a num of type double, then
+  /// returns a DoubleWrapper. If the [obj]ect provided is a ByteData, then
+  /// returns a ByteDataWrapper. Otherwise just returns the [obj]ect unchanged.
+  ///
+  /// We need to wrap integers and doubles because dart equality means that
+  /// 1 == 1.0. When storing in a map, checking for an object whose value is a
+  /// an integer of '1' might incorrectly get the result of an object whose
+  /// value is a double of '1.0'.
+  ///
+  /// ByteData's must also be wrapped as dart equality doesn't compare the
+  /// contents of ByteData, which we need to aggressively deduplicate storage.
+
+  Object _wrapMap(Object obj) {
+    if (obj is int) {
+      var result = _integerWrapperMap[obj];
+      if (result == null) {
+        result = IntegerWrapper(obj);
+        _integerWrapperMap[obj] = result;
+      }
+      return result;
+    } else if (obj is double) {
+      var result = _doubleWrapperMap[obj];
+      if (result == null) {
+        result = DoubleWrapper(obj);
+        _doubleWrapperMap[obj] = result;
+      }
+      return result;
+    } else if (obj is ByteData) {
+      // Always wrap the ByteData into a ByteDataWrapper. The lookup in the
+      // _byteDataWrapperMap will use the hashCode and equality methods to
+      // properly compare contents. The result will be any identical
+      // ByteDataWrapper object.
+      var wrapper = ByteDataWrapper(obj);
+      var result = _byteDataWrapperMap[wrapper];
+      if (result == null) {
+        _byteDataWrapperMap[wrapper] = wrapper;
+        return wrapper;
+      } else {
+        return result;
+      }
+    } else {
+      return obj;
+    }
+  }
+
+  Object _readMap(Object obj) {
+    if (obj is int) {
+      return _integerWrapperMap[obj]!;
+    } else if (obj is double) {
+      return _doubleWrapperMap[obj]!;
+    } else if (obj is ByteData) {
+      var wrapper = ByteDataWrapper(obj);
+      return _byteDataWrapperMap[wrapper]!;
+    } else {
+      return obj;
     }
   }
 
@@ -220,4 +289,104 @@ class BinaryPropertyListWriter {
     }
   }
 
+}
+
+/// Wrapper to force writing a double value as a 64-bit floating point number,
+/// which is useful when storing num[bers] in a Map.
+
+class DoubleWrapper {
+  final double value;
+
+  DoubleWrapper(this.value);
+
+  @override
+  bool operator ==(Object other) {
+    if (!(other is DoubleWrapper)) {
+      return false;
+    }
+    return value == other.value;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() {
+    return value.toString();
+  }
+
+}
+
+/// Wrapper to force writing an integer value as integer which is useful when
+/// storing num[bers] in a Map.
+
+class IntegerWrapper {
+  final int value;
+
+  IntegerWrapper(this.value);
+
+  @override
+  bool operator ==(Object other) {
+    if (!(other is IntegerWrapper)) {
+      return false;
+    }
+    return value == other.value;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() {
+    return value.toString();
+  }
+
+}
+
+/// Wrapper to force comparison of ByteData's for storage in a Map.
+
+class ByteDataWrapper {
+  final ByteData value;
+
+  ByteDataWrapper(this.value);
+
+  @override
+  bool operator ==(Object other) {
+    if (!(other is ByteDataWrapper)) {
+      return false;
+    }
+    if (value.lengthInBytes != other.value.lengthInBytes) {
+      return false;
+    }
+    for (var i = 0; i < value.lengthInBytes; i++) {
+      if (value.getUint8(i) != other.value.getUint8(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode {
+    var result = 1;
+    for (var i = 0; i < value.lengthInBytes; ++i) {
+      result = 31 * result + value.getUint8(i);
+    }
+    return result;
+  }
+
+  @override
+  String toString() {
+    final len = 64;
+    var sb = StringBuffer();
+    sb.write('len=${value.lengthInBytes}');
+    var list = Uint8List.sublistView(value);
+    var str = hex.encoder.convert(list.sublist(0, list.length > len ? len :
+      list.length));
+    sb.write(' $str');
+    if (list.length > len) {
+      sb.write('...');
+    }
+    return sb.toString();
+  }
 }

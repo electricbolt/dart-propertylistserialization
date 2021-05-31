@@ -185,12 +185,12 @@ class ByteDataWriter {
     var result = Uint8List(_totalSize);
     var resultSize = 0;
     for (var i = 0; i < _bufListSize.length; i++) {
-      var buf = _bufList[i].buffer.asUint8List(0, _bufListSize[i]);
+      var buf = Uint8List.sublistView(_bufList[i], 0, _bufListSize[i]);
       result.setAll(resultSize, buf);
       resultSize += _bufListSize[i];
     }
     if (_bufSize > 0) {
-      result.setAll(resultSize, _buf.buffer.asUint8List(0, _bufSize));
+      result.setAll(resultSize, Uint8List.sublistView(_buf, 0, _bufSize));
     }
     return result.buffer.asByteData();
   }

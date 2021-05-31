@@ -101,7 +101,7 @@ class BinaryPropertyListReader {
         var lo = _readLengthOffset(offset, objectInfo);
         var sb = StringBuffer();
         for (var i = 0; i < lo.length; i++) {
-          var charCode = _buf.getUint16(lo.offset + (i*2), Endian.big);
+          var charCode = _buf.getUint16(lo.offset + (i * 2), Endian.big);
           sb.writeCharCode(charCode);
         }
         return sb.toString();
@@ -149,7 +149,7 @@ class BinaryPropertyListReader {
     var result = _LengthOffset();
     if (objectInfo == 0xF) {
       // Length values >= 15 are stored in the bytes following.
-      var intInfo = _buf.getUint8(offset+1) & 0x0F; // low nibble
+      var intInfo = _buf.getUint8(offset + 1) & 0x0F; // low nibble
       var size = pow(2, intInfo) as int;
       result.offset = offset + 2 + size;
       result.length = _readLong(offset + 2, size);

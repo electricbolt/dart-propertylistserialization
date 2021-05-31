@@ -1,139 +1,191 @@
+// binarypropertylistwriter_test.dart
+// PropertyListSerialization Copyright © 2021; Electric Bolt Limited.
+
 import 'dart:typed_data';
 
 import 'package:propertylistserialization/propertylistserialization.dart';
 import 'package:propertylistserialization/src/binarypropertylistreader.dart';
 import 'package:propertylistserialization/src/binarypropertylistwriter.dart';
 import 'package:test/test.dart';
+import 'package:convert/convert.dart';
 
 import 'binarypropertylistreader_test.dart';
 
 void main() {
 
-  // Array
+  test('ByteDataWrapper', () {
+    // Test that the internal ByteDataWrapper class performs equality and
+    // hashCode across the entire array of bytes contained within. (Unlike
+    // ByteData which simply compares for equivalent object references).
+    var b1 = bytes('62706c6973');
+    var b2 = bytes('62706c6973');
+    var b3 = bytes('62757cd3fa');
+    var bw1 = ByteDataWrapper(b1);
+    var bw2 = ByteDataWrapper(b2);
+    var bw3 = ByteDataWrapper(b3);
 
-  test('emptyArray', () {
-    var xcodeTemplate = '62706c6973743030a0080000000000000101000000000000000100'
-        '000000000000000000000000000009';
+    if (bw1 != bw2) {
+      fail('bw1 should equal bw2');
+    }
+    if (bw1 == bw3) {
+      fail('bw1 should not equal bw3');
+    }
 
-    var p = BinaryPropertyListWriter(<String>[]);
-    var g = p.write();
-    expectByteData(g, bytes(xcodeTemplate));
+    var map = <ByteDataWrapper, ByteDataWrapper>{};
+    map[bw1] = bw1;
+    map[bw2] = bw2;
+    expect(map.length, equals(1));
+    expect(hex.encoder.convert(Uint8List.sublistView(map[bw1]!.value)),
+        equals('62706c6973'));
+
+    map[bw3] = bw3;
+    expect(map.length, equals(2));
+    expect(hex.encoder.convert(Uint8List.sublistView(map[bw3]!.value)),
+      equals('62757cd3fa'));
   });
 
-  test('filledArray', () {
-    var xcodeTemplate = '62706c6973743030aa0102030405060708090a1000223fc0000023'
-        '400400000000000009084500010203044f1014000102030405060708090a0b0c0d0e0f'
-        '1011121333c1e9fc3af0e000005f101b54686520636f77206a756d706564206f766572'
-        '2074686520646f676f101f0100010100540068006500200063006f00770020006a0075'
-        '006d0070006500640020006f007600650072002000740068006500200064006f006701'
-        '0201030813151a2324252b424b690000000000000101000000000000000b0000000000'
-        '00000000000000000000aa';
+  group('array', () {
+    test('emptyArray', () {
+      var xcodeTemplate = '62706c6973743030a00800000000000001010000000000000001'
+          '00000000000000000000000000000009';
 
-    var list = [];
-    list.add(0);
-    list.add(Float32(1.5));
-    list.add(2.5);
-    list.add(true);
-    list.add(false);
-    list.add(makeData(5));
-    list.add(makeData(20));
-    list.add(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13));
-    list.add('The cow jumped over the dog');
-    list.add('\u0100\u0101The cow jumped over the dog\u0102\u0103');
+      var p = BinaryPropertyListWriter(<String>[]);
+      var g = p.write();
+      expectByteData(g, bytes(xcodeTemplate));
+    });
 
-    var p = BinaryPropertyListWriter(list);
-    var g = p.write();
-    expectByteData(g, bytes(xcodeTemplate));
+    test('filledArray', () {
+      var xcodeTemplate = '62706c6973743030aa0102030405060708090a1000223fc00000'
+          '23400400000000000009084500010203044f1014000102030405060708090a0b0c0d'
+          '0e0f1011121333c1e9fc3af0e000005f101b54686520636f77206a756d706564206f'
+          '7665722074686520646f676f101f0100010100540068006500200063006f00770020'
+          '006a0075006d0070006500640020006f007600650072002000740068006500200064'
+          '006f0067010201030813151a2324252b424b69000000000000010100000000000000'
+          '0b000000000000000000000000000000aa';
+
+      var list = [];
+      list.add(0);
+      list.add(Float32(1.5));
+      list.add(2.5);
+      list.add(true);
+      list.add(false);
+      list.add(makeData(5));
+      list.add(makeData(20));
+      list.add(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13));
+      list.add('The cow jumped over the dog');
+      list.add('\u0100\u0101The cow jumped over the dog\u0102\u0103');
+
+      var p = BinaryPropertyListWriter(list);
+      var g = p.write();
+      expectByteData(g, bytes(xcodeTemplate));
+    });
   });
 
-  // Dict
+  group('dict', () {
+    test('emptyDict', () {
+      var xcodeTemplate = '62706c6973743030d00800000000000001010000000000000001'
+          '00000000000000000000000000000009';
 
-  test('emptyDict', () {
-    var xcodeTemplate = '62706c6973743030d0080000000000000101000000000000000100'
-        '000000000000000000000000000009';
+      var p = BinaryPropertyListWriter(<String, Object>{});
+      var g = p.write();
+      expectByteData(g, bytes(xcodeTemplate));
+    });
 
-    var p = BinaryPropertyListWriter(<String,Object>{});
-    var g = p.write();
-    expectByteData(g, bytes(xcodeTemplate));
+    // Dict
+
+    test('dictInteger25', () {
+      var xcodeTemplate = '62706c6973743030d1010253696e741019080b0f000000000000'
+          '0101000000000000000300000000000000000000000000000011';
+
+      var dict = <String, int>{};
+      dict['int'] = 25;
+
+      var p = BinaryPropertyListWriter(dict);
+      var g = p.write();
+      expectByteData(g, bytes(xcodeTemplate));
+    });
+
+    test('filledDict', () {
+      var dict = <String, Object>{};
+      dict['int'] = 0;
+      dict['float'] = Float32(1.5);
+      dict['double'] = 2.5;
+      dict['true'] = true;
+      dict['false'] = false;
+      dict['data5'] = makeData(5);
+      dict['data20'] = makeData(20);
+      dict['date'] = DateTime.utc(1890, DateTime.june, 25, 06, 45, 13);
+      dict['ascii'] = 'The cow jumped over the dog';
+      dict['utf16'] = '\u0100\u0101The cow jumped over the dog\u0102\u0103';
+
+      var p = BinaryPropertyListWriter(dict);
+      var g = p.write();
+
+      // Can't test against the string template, since the order of the
+      // dictionaries is undefined in binary plists (as opposed to xml plists
+      // which are sorted in ascending order).
+      // var xcodeTemplate = '62706c6973743030da0102030405060708090a0b0c0d0e0f1'
+      //     '0111213145664617461323056646f75626c6553696e745566616c736555757466'
+      //     '31365464617465547472756555666c6f61745564617461355561736369694f101'
+      //     '4000102030405060708090a0b0c0d0e0f10111213234004000000000000100008'
+      //     '6f101f0100010100540068006500200063006f00770020006a0075006d0070006'
+      //     '500640020006f007600650072002000740068006500200064006f006701020103'
+      //     '33c1e9fc3af0e0000009223fc000004500010203045f101b54686520636f77206'
+      //     'a756d706564206f7665722074686520646f67081d242b2f353b40454b51576e77'
+      //     '797abbc4c5cad0000000000000010100000000000000150000000000000000000'
+      //     '00000000000ee';
+
+      expect(g.lengthInBytes,
+          291); // the length will be identical to the xcodeTemplate above.
+
+      var q = BinaryPropertyListReader(g);
+      var o = q.parse();
+      expect(o.runtimeType, <String, Object>{}.runtimeType);
+      dict = o as Map<String, Object>;
+      expect(dict.length, equals(10));
+      expect(dict['int'], equals(0));
+      expect(dict['float'], equals(1.5));
+      expect(dict['double'], equals(2.5));
+      expect(dict['true'], equals(true));
+      expect(dict['false'], equals(false));
+      expectByteData(dict['data5'] as ByteData, makeData(5));
+      expectByteData(dict['data20'] as ByteData, makeData(20));
+      expect(dict['date'], equals(DateTime.utc(1890, DateTime.june, 25, 06, 45,
+          13)));
+      expect(dict['ascii'], equals('The cow jumped over the dog'));
+      expect(
+          dict['utf16'], equals('\u0100\u0101The cow jumped over the dog\u0102'
+          '\u0103'));
+    });
   });
 
-  // Dict
+  group('string', () {
+    test('asciiString', () {
+      testString('',
+          '62706c69737430305008000000000000010100000000000000010000000000000000'
+          '0000000000000009');
+      testString(
+          ' ', '62706c697374303051200800000000000001010000000000000001000000000'
+          '0000000000000000000000a');
+      testString(
+          'The dog jumped over the moon', '62706c69737430305f101c54686520646f67'
+          '206a756d706564206f76657220746865206d6f6f6e08000000000000010100000000'
+          '0000000100000000000000000000000000000027');
+    });
 
-  test('dictInteger25', () {
-    var xcodeTemplate = '62706c6973743030d1010253696e741019080b0f00000000000001'
-        '01000000000000000300000000000000000000000000000011';
-
-    var dict = <String,int>{};
-    dict['int'] = 25;
-
-    var p = BinaryPropertyListWriter(dict);
-    var g = p.write();
-    expectByteData(g, bytes(xcodeTemplate));
-  });
-
-  test('filledDict', ()
-  {
-    var dict = <String, Object>{};
-    dict['int'] = 0;
-    dict['float'] = Float32(1.5);
-    dict['double'] = 2.5;
-    dict['true'] = true;
-    dict['false'] = false;
-    dict['data5'] = makeData(5);
-    dict['data20'] = makeData(20);
-    dict['date'] = DateTime.utc(1890, DateTime.june, 25, 06, 45, 13);
-    dict['ascii'] = 'The cow jumped over the dog';
-    dict['utf16'] = '\u0100\u0101The cow jumped over the dog\u0102\u0103';
-
-    var p = BinaryPropertyListWriter(dict);
-    var g = p.write();
-
-    // Can't test against the string template, since the order of the dictionaries is undefined
-    // in binary plists (as opposed to xml plists which are sorted in ascending order).
-    // var xcodeTemplate = '62706c6973743030da0102030405060708090a0b0c0d0e0f10111213145664617461323056646f75626c6553696e745566616c73655575746631365464617465547472756555666c6f61745564617461355561736369694f1014000102030405060708090a0b0c0d0e0f101112132340040000000000001000086f101f0100010100540068006500200063006f00770020006a0075006d0070006500640020006f007600650072002000740068006500200064006f00670102010333c1e9fc3af0e0000009223fc000004500010203045f101b54686520636f77206a756d706564206f7665722074686520646f67081d242b2f353b40454b51576e77797abbc4c5cad000000000000001010000000000000015000000000000000000000000000000ee';
-
-    expect(g.lengthInBytes,
-        291); // the length will be identical to the xcodeTemplate above.
-
-    var q = BinaryPropertyListReader(g);
-    var o = q.parse();
-    expect(o.runtimeType, <String, Object>{}.runtimeType);
-    dict = o as Map<String, Object>;
-    expect(dict.length, 10);
-    expect(dict['int'], 0);
-    expect(dict['float'], 1.5);
-    expect(dict['double'], 2.5);
-    expect(dict['true'], true);
-    expect(dict['false'], false);
-    expectByteData(dict['data5'] as ByteData, makeData(5));
-    expectByteData(dict['data20'] as ByteData, makeData(20));
-    expect(dict['date'], DateTime.utc(1890, DateTime.june, 25, 06, 45, 13));
-    expect(dict['ascii'], 'The cow jumped over the dog');
-    expect(dict['utf16'], '\u0100\u0101The cow jumped over the dog\u0102'
-        '\u0103');
-  });
-
-  // String
-
-  test('asciiString', () {
-    testString('', '62706c6973743030500800000000000001010000000000000001000000'
-        '00000000000000000000000009');
-    testString(' ', '62706c697374303051200800000000000001010000000000000001000'
-        '0000000000000000000000000000a');
-    testString('The dog jumped over the moon', '62706c69737430305f101c54686520'
-        '646f67206a756d706564206f76657220746865206d6f6f6e0800000000000001010000'
-        '00000000000100000000000000000000000000000027');
-  });
-
-  test('unicodeString', () {
-    testString('Ā', '62706c697374303061010008000000000000010100000000000000010'
-        '000000000000000000000000000000b');
-    testString('Āā', '62706c69737430306201000101080000000000000101000000000000'
-        '00010000000000000000000000000000000d');
-    testString('ĀāThe cow jumped over the dogĂă', '62706c69737430306f101f01000'
-        '10100540068006500200063006f00770020006a0075006d0070006500640020006f007'
-        '600650072002000740068006500200064006f006701020103080000000000000101000'
-        '000000000000100000000000000000000000000000049');
+    test('unicodeString', () {
+      testString(
+          'Ā', '62706c697374303061010008000000000000010100000000000000010000000'
+          '000000000000000000000000b');
+      testString(
+          'Āā', '62706c69737430306201000101080000000000000101000000000000000100'
+          '00000000000000000000000000000d');
+      testString(
+          'ĀāThe cow jumped over the dogĂă', '62706c69737430306f101f01000101005'
+          '40068006500200063006f00770020006a0075006d0070006500640020006f0076006'
+          '50072002000740068006500200064006f00670102010308000000000000010100000'
+          '0000000000100000000000000000000000000000049');
+    });
   });
 
   // Integer
@@ -217,8 +269,6 @@ void main() {
         '000000000101000000000000000100000000000000000000000000000011');
   });
 
-  // Real
-
   test('real', () {
     testFloat(0.0, '62706c69737430302200000000080000000000000101000000000000000'
         '10000000000000000000000000000000d');
@@ -251,27 +301,23 @@ void main() {
         '0000101000000000000000100000000000000000000000000000011');
   });
 
-  // True
+  group('boolean', () {
+    test('true', () {
+      var xcodeTemplate = '62706c6973743030090800000000000001010000000000000001'
+          '00000000000000000000000000000009';
+      var p = BinaryPropertyListWriter(true);
+      var g = p.write();
+      expectByteData(bytes(xcodeTemplate), g);
+    });
 
-  test('true', () {
-    var xcodeTemplate = '62706c697374303009080000000000000101000000000000000100'
-        '000000000000000000000000000009';
-    var p = BinaryPropertyListWriter(true);
-    var g = p.write();
-    expectByteData(bytes(xcodeTemplate), g);
+    test('false', () {
+      var xcodeTemplate = '62706c6973743030080800000000000001010000000000000001'
+          '00000000000000000000000000000009';
+      var p = BinaryPropertyListWriter(false);
+      var g = p.write();
+      expectByteData(bytes(xcodeTemplate), g);
+    });
   });
-
-  // False
-
-  test('false', () {
-    var xcodeTemplate = '62706c697374303008080000000000000101000000000000000100'
-        '000000000000000000000000000009';
-    var p = BinaryPropertyListWriter(false);
-    var g = p.write();
-    expectByteData(bytes(xcodeTemplate), g);
-  });
-
-  // Date
 
   test('date', ()
   {
@@ -285,8 +331,6 @@ void main() {
         '62706c69737430303341c1b835e1800000080000000000000101000000000000000100'
         '000000000000000000000000000011');
   });
-
-  // Data
 
   test('data', ()
   {
@@ -344,8 +388,6 @@ void main() {
 void testData(int len, String xcodeTemplate) {
   var p = BinaryPropertyListWriter(makeData(len));
   var g = p.write();
-  // var str = hex.encoder.convert(g.buffer.asUint8List().toList());
-  // print('string value is $str');
   expectByteData(bytes(xcodeTemplate), g);
 }
 
