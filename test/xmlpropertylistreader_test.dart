@@ -30,6 +30,19 @@ void main() {
 
   group('array', ()
   {
+    test('emptyArrayNoFinalWhitespace', () {
+      var template = '<?xml version="1.0" encoding="UTF-8"?>\n'
+          '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+          '<plist version="1.0">\n'
+          '\t<array>\n'
+          '\t</array>\n'
+          '</plist>';
+
+      var p = XMLPropertyListReader(template);
+      var o = p.parse() as List<Object>;
+      expect(o.length, equals(0));
+    });
+
     test('emptyArray', () {
       var template = '<?xml version="1.0" encoding="UTF-8"?>\n'
           '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'

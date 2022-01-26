@@ -34,7 +34,7 @@ class XMLPropertyListReader {
           'date,integer,real,true,false)');
     }
     var result = _readObject(event);
-    _requireEndElement('plist');
+    _requireEndElement('plist', skipOptionalText: true);
     _logEnd('</plist>');
     return result;
   }
@@ -231,12 +231,14 @@ class XMLPropertyListReader {
   /// name [tagName], otherwise throws a [PropertyListReadStreamException].
   /// e.g. </string> where `string` is the [tagName] value.
 
-  void _requireEndElement(String tagName) {
+  void _requireEndElement(String tagName, {bool skipOptionalText = false}) {
     var event = _nextEventSkipOptionalText();
     if (!(event is XmlEndElementEvent) || event.name != tagName) {
       throw _expected(event, tagName);
     }
-    _skipOptionalText();
+    if (!skipOptionalText) {
+      _skipOptionalText();
+    }
   }
 
   /// Ensures the next element from the xml stream is a DOCTYPE, otherwise
