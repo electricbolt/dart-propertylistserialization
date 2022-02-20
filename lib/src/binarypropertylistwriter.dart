@@ -20,6 +20,7 @@ import 'package:convert/convert.dart';
 /// Dart true -> true (BOOL)
 /// Dart false -> false (BOOL)
 /// ByteData -> data (NSData)
+///
 
 class BinaryPropertyListWriter {
 

@@ -81,6 +81,31 @@ class Float32 {
 
 }
 
+/// A CoreFoundation CF$UID value used in a NSKeyedArchiver binary plist.
+
+class UID {
+  final int value;
+
+  UID(this.value);
+
+  @override
+  bool operator ==(Object other) {
+    if (!(other is UID)) {
+      return false;
+    }
+    return value == other.value;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() {
+    return value.toString();
+  }
+
+}
+
 class PropertyListSerialization {
 
   /// For the object graph provided, returns a property list as binary ByteData.
@@ -129,21 +154,25 @@ class PropertyListSerialization {
     }
   }
 
-  /// Creates and returns a object graph from the specified property list
+  /// Creates and returns an object graph from the specified property list
   /// binary ByteData. Equivalent to iOS method
   /// `[NSPropertyList propertyListWithData:options:format:error]`
   ///
   /// The [data] parameter must be a ByteData of binary plist.
   ///
+  /// If [keyedArchive] parameter is true, then CF$UID constructs are also
+  /// decoded into UID objects. If false, then a PropertyListReadStreamException
+  /// is thrown if a CF$UID construct is encountered.
+  ///
   /// Returns one of String, int, double, Map<String, Object>,
-  /// List, DateTime, bool or ByteData.
+  /// List, DateTime, bool, ByteData or UID.
   ///
   /// Throws [PropertyListReadStreamException] if the plist is corrupt, values
   /// could not be converted or the input stream is EOF.
 
-  static Object propertyListWithData(ByteData data) {
+  static Object propertyListWithData(ByteData data, {bool keyedArchive = false}) {
     try {
-      var p = BinaryPropertyListReader(data);
+      var p = BinaryPropertyListReader(data, keyedArchive);
       return p.parse();
     } catch(e, s) {
       if (e is PropertyListReadStreamException) {

@@ -138,7 +138,7 @@ void main() {
       expect(g.lengthInBytes,
           291); // the length will be identical to the xcodeTemplate above.
 
-      var q = BinaryPropertyListReader(g);
+      var q = BinaryPropertyListReader(g, false);
       var o = q.parse();
       expect(o.runtimeType, <String, Object>{}.runtimeType);
       dict = o as Map<String, Object>;

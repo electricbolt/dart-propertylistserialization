@@ -18,6 +18,7 @@ Looking for an Android (Java) [implementation](https://github.com/electricbolt/p
 #### Binary plist (binary1)
 
 * Supports version `bplist00` constructs only (all data type conversions as per XML - if you can serialize/deserialize an object tree into XML, then you can serialize/deserialize the same object tree into Binary).
+* Also supports deserializing of `NSKeyedArchiver` CF$UID constructs.
 * Byte by byte accurate output ***2** from method `PropertyListSerialization.dataFromPropertyList()` with iOS method `
   [NSPropertyListSerialization dataFromPropertyList:format:options:error:]`
 
@@ -140,32 +141,33 @@ try {
 
 Input Dart type | Equivalent Obj-C type | Output plist type
 ---|---|---
-String | NSString | &lt;string&gt;
-int | NSNumber (integerValue) | &lt;integer&gt;
-Float32 | NSNumber (floatValue) | &lt;real&gt; ***3**
-double | NSNumber (doubleValue) | &lt;real&gt;
-Map&lt;String, Object&gt; | NSDictionary| &lt;dict&gt;
-List | NSArray | &lt;array&gt;
-DateTime | NSDate | &lt;date&gt;
-true | NSNumber (boolValue) YES | &lt;true&gt;
-false | NSNumber (boolValue) NO | &lt;false&gt;
-ByteData | NSData | &lt;data&gt;
+`String` | `NSString` | `<string>`
+`int` | `NSNumber` (`integerValue`) | `<integer>`
+`Float32` | `NSNumber` (`floatValue`) | `<real>` ***3**
+`double` | `NSNumber` (`doubleValue`) | `<real>`
+`Map<String, Object>` | `NSDictionary` | `<dict>`
+`List` | `NSArray` | `<array>`
+`DateTime` | `NSDate` | `<date>`
+`true` | `NSNumber` (`boolValue`) `YES` | `<true>`
+`false` | `NSNumber` (`boolValue`) `NO` | `<false>`
+`ByteData` | `NSData` | `<data>`
 
-***3** Serialization only, deserialization will always output double.
+***3** Serialization only, deserialization will always output `double`.
 
 #### Deserialization (plist -> Dart)
 
 Input plist type | Equivalent Obj-C type | Output Dart type
 ---|---|---
-&lt;string&gt; | NSString | String
-&lt;integer&gt; | NSNumber (longValue) | int
-&lt;real&gt; | NSNumber (doubleValue) | double
-&lt;dict&gt; | NSDictionary | Map&lt;String, Object&gt;
-&lt;array&gt; | NSArray | List
-&lt;date&gt; | NSDate | DateTime
-&lt;true&gt; | NSNumber (boolValue) YES | true
-&lt;false&gt; | NSNumber (boolValue) NO | false
-&lt;data&gt; | NSData | ByteData
+`<string>` | `NSString` | `String`
+`<integer>` | `NSNumber` (`longValue`) | `int`
+`<real>` | `NSNumber` (`doubleValue`) | `double`
+`<dict>` | `NSDictionary` | `Map<String, Object>`
+`<array>` | `NSArray` | `List`
+`<date>` | `NSDate` | `DateTime`
+`<true>` | `NSNumber` (`boolValue`) `YES` | `true`
+`<false>` | `NSNumber` (`boolValue`) `NO` | `false`
+`<data>` | `NSData` | `ByteData`
+`CF$UID` (binary plist only) | *n/a* | `UID`
 
 ## Class PropertyListSerialization
 
@@ -177,11 +179,11 @@ static String stringWithPropertyList(Object obj);
 
 For the object graph provided, returns a property list as a xml String. Equivalent to iOS method `[NSPropertyList dataWithPropertyList:format:options:error]`
 
-**params** *obj* - The object graph to write out as a xml property list. The object graph may only contain the following types: String, int, Float32, double, Map&lt;String, Object&gt;, List, DateTime, bool or ByteData.
+**params** *obj* - The object graph to write out as a xml property list. The object graph may only contain the following types: `String`, `int`, `Float32`, `double`, `Map<String, Object>`, `List`, `DateTime`, `bool` or `ByteData`.
   
-**returns** *String* of the xml plist.
+**returns** `String` of the xml plist.
 
-**throws** *PropertyListWriteStreamException* if the object graph is incompatible.
+**throws** `PropertyListWriteStreamException` if the object graph is incompatible.
 
 ---
 
@@ -193,11 +195,11 @@ static Object propertyListWithString(String string);
 
 Creates and returns an object graph from the specified property list xml String. Equivalent to iOS method `[NSPropertyList propertyListWithData:options:format:error]`
 
-**params** *string* - String of xml plist.
+**params** *string* - `String` of xml plist.
 
-**returns** Returns one of String, int, double, Map&lt;String, Object&gt;, List, DateTime, bool or ByteData.
+**returns** Returns one of `String`, `int`, `double`, `Map<String, Object>`, `List`, `DateTime`, `bool` or `ByteData`.
 
-**throws** *PropertyListReadStreamException* if the plist is corrupt, values could not be converted or the input stream is EOF.
+**throws** `PropertyListReadStreamException` if the plist is corrupt, values could not be converted or the input stream is EOF.
 
 ---
 
@@ -207,26 +209,27 @@ Creates and returns an object graph from the specified property list xml String.
 static ByteData dataWithPropertyList(Object obj);
 ```
 
-For the object graph provided, returns a property list as a binary ByteData. Equivalent to iOS method `[NSPropertyList dataWithPropertyList:format:options:error]`
+For the object graph provided, returns a property list as a binary `ByteData`. Equivalent to iOS method `[NSPropertyList dataWithPropertyList:format:options:error]`
 
-**params** *obj* - The object graph to write out as a binary property list. The object graph may only contain the following types: String, int, Float32, double, Map&lt;String, Object&gt;, List, DateTime, bool or ByteData.
+**params** *obj* - The object graph to write out as a binary property list. The object graph may only contain the following types: `String`, `int`, `Float32`, `double`, `Map<String, Object>`, `List`, `DateTime`, `bool` or `ByteData`.
 
-**returns** *ByteData* of the binary plist.
+**returns** `ByteData` of the binary plist.
 
-**throws** *PropertyListWriteStreamException* if the object graph is incompatible.
+**throws** `PropertyListWriteStreamException` if the object graph is incompatible.
 
 ---
 
 #### Object propertyListWithData(ByteData)
 
 ```dart
-static Object propertyListWithData(ByteData data);
+static Object propertyListWithData(ByteData data, {bool keyedArchive = false});
 ```
 
-Creates and returns an object graph from the specified property list binary ByteData. Equivalent to iOS method `[NSPropertyList propertyListWithData:options:format:error]`
+Creates and returns an object graph from the specified property list binary `ByteData`. Equivalent to iOS method `[NSPropertyList propertyListWithData:options:format:error]`
 
-**params** *data* - ByteData of binary plist.
+**params** *data* - `ByteData` of binary plist.
+**params** *keyedArchive* - `bool` - if true then deserialization also supports CF$UID constructs and returns it as a UID object.
 
-**returns** Returns one of String, int, double, Map&lt;String, Object&gt;, List, DateTime, bool or ByteData.
+**returns** Returns one of `String`, `int`, `double`, `Map<String, Object>`, `List`, `DateTime`, `bool`, `ByteData` or `UID`.
 
-**throws** *PropertyListReadStreamException* if the plist is corrupt, values could not be converted or the input stream is EOF.
+**throws** `PropertyListReadStreamException` if the plist is corrupt, values could not be converted or the input stream is EOF.

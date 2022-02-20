@@ -3,6 +3,7 @@
 
 import 'dart:typed_data';
 
+import 'package:propertylistserialization/propertylistserialization.dart';
 import 'package:propertylistserialization/src/binarypropertylistreader.dart';
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
@@ -12,7 +13,7 @@ void main() {
     test('emptyArray', () {
       var template = '62706c6973743030a0080000000000000101000000000000000100000'
           '000000000000000000000000009';
-      var p = BinaryPropertyListReader(bytes(template));
+      var p = BinaryPropertyListReader(bytes(template), false);
       var o = p.parse();
       expect(o.runtimeType, <Object>[].runtimeType);
       var list = o as List<Object>;
@@ -27,7 +28,7 @@ void main() {
           '075006d0070006500640020006f007600650072002000740068006500200064006f0'
           '067010201030813151a2324252b424b690000000000000101000000000000000b000'
           '000000000000000000000000000aa';
-      var p = BinaryPropertyListReader(bytes(template));
+      var p = BinaryPropertyListReader(bytes(template), false);
       var o = p.parse();
       expect(o.runtimeType, <Object>[].runtimeType);
       var list = o as List<Object>;
@@ -51,7 +52,7 @@ void main() {
     test('emptyDict', () {
       var template = '62706c6973743030d0080000000000000101000000000000000100000'
           '000000000000000000000000009';
-      var p = BinaryPropertyListReader(bytes(template));
+      var p = BinaryPropertyListReader(bytes(template), false);
       var o = p.parse();
       expect(o.runtimeType, <String, Object>{}.runtimeType);
       var dict = o as Map<String, Object>;
@@ -68,7 +69,7 @@ void main() {
           'fc000004500010203045f101b54686520636f77206a756d706564206f76657220746'
           '86520646f67081d242b2f353b40454b51576e77797abbc4c5cad0000000000000010'
           '10000000000000015000000000000000000000000000000ee';
-      var p = BinaryPropertyListReader(bytes(template));
+      var p = BinaryPropertyListReader(bytes(template), false);
       var o = p.parse();
       expect(o.runtimeType, <String, Object>{}.runtimeType);
       var dict = o as Map<String, Object>;
@@ -86,6 +87,108 @@ void main() {
       expect(
           dict['utf16'], equals('\u0100\u0101The cow jumped over the dog\u0102'
           '\u0103'));
+    });
+  });
+
+  group('issues', () {
+    // Binary plist converted to XML plist:
+
+    // <?xml version="1.0" encoding="UTF-8"?>
+    // <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    // <plist version="1.0">
+    // <dict>
+    // 	<key>$archiver</key>
+    // 	<string>NSKeyedArchiver</string>
+    // 	<key>$objects</key>
+    // 	<array>
+    // 		<string>$null</string>
+    // 		<dict>
+    // 			<key>$class</key>
+    // 			<dict>
+    // 				<key>CF$UID</key>
+    // 				<integer>4</integer>
+    // 			</dict>
+    // 			<key>NS.objects</key>
+    // 			<array>
+    // 				<dict>
+    // 					<key>CF$UID</key>
+    // 					<integer>2</integer>
+    // 				</dict>
+    // 				<dict>
+    // 					<key>CF$UID</key>
+    // 					<integer>3</integer>
+    // 				</dict>
+    // 			</array>
+    // 		</dict>
+    // 		<real>15</real>
+    // 		<real>16</real>
+    // 		<dict>
+    // 			<key>$classes</key>
+    // 			<array>
+    // 				<string>NSArray</string>
+    // 				<string>NSObject</string>
+    // 			</array>
+    // 			<key>$classname</key>
+    // 			<string>NSArray</string>
+    // 		</dict>
+    // 	</array>
+    // 	<key>$top</key>
+    // 	<dict>
+    // 		<key>root</key>
+    // 		<dict>
+    // 			<key>CF$UID</key>
+    // 			<integer>1</integer>
+    // 		</dict>
+    // 	</dict>
+    // 	<key>$version</key>
+    // 	<integer>100000</integer>
+    // </dict>
+    // </plist>
+
+    test('issue#2', () {
+      var template = '62706c6973743030d4010203040506070a582476657273696f6e59246'
+          '1726368697665725424746f7058246f626a6563747312000186a05f100f4e534b657'
+          '965644172636869766572d1080954726f6f748001a50b0c13141555246e756c6cd20'
+          'd0e0f125a4e532e6f626a656374735624636c617373a2101180028003800423402e0'
+          '00000000000234030000000000000d2161718195a24636c6173736e616d655824636'
+          'c6173736573574e534172726179a2181a584e534f626a65637408111a24293237494'
+          'c5153595f646f76797b7d7f889196a1aab2b50000000000000101000000000000001'
+          'b000000000000000000000000000000be';
+      // Test that when keyedArchive = false throws an UnsupportedError when
+      // CF$UID construct is read.
+      var p = BinaryPropertyListReader(bytes(template), false);
+      try {
+        p.parse();
+        throw new Exception('Expected UnsupportedError');
+      } on UnsupportedError {
+      }
+
+      p = BinaryPropertyListReader(bytes(template), true);
+      var o = p.parse();
+      expect(o.runtimeType, <String, Object>{}.runtimeType);
+      var dict = o as Map<String, Object>;
+
+      expect(dict.length, equals(4));
+      expect(dict[r'$version'], equals(100000));
+      expect(dict[r'$archiver'], equals('NSKeyedArchiver'));
+
+      var topDict = dict[r'$top'] as Map<String, Object>;
+      expect(topDict['root'], equals(UID(1)));
+
+      var objectsList = dict[r'$objects'] as List<Object>;
+      expect(objectsList[0], equals(r'$null'));
+      var dict1 = objectsList[1] as Map<String, Object>;
+      var NSObjectsList = dict1['NS.objects'] as List;
+      expect(NSObjectsList[0], equals(UID(2)));
+      expect(NSObjectsList[1], equals(UID(3)));
+      expect(dict1[r'$class'], equals(UID(4)));
+      expect(objectsList[2], equals(15.0));
+      expect(objectsList[3], equals(16.0));
+      var dict4 = objectsList[4] as Map<String, Object>;
+      expect(dict4[r'$classname'], equals('NSArray'));
+      var classesList = dict4[r'$classes'] as List;
+      expect(classesList[0], equals('NSArray'));
+      expect(classesList[1], equals('NSObject'));
     });
   });
 
@@ -353,7 +456,7 @@ void expectByteData(ByteData actual, ByteData matcher) {
 /// object as String [matcher].
 
 void expectString(String matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template));
+  var p = BinaryPropertyListReader(bytes(template), false);
   var o = p.parse();
   expect(true, o.runtimeType == String);
   var s = o as String;
@@ -364,7 +467,7 @@ void expectString(String matcher, String template) {
 /// object as an int [matcher].
 
 void expectInteger(int matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template));
+  var p = BinaryPropertyListReader(bytes(template), false);
   var o = p.parse();
   expect(true, o.runtimeType == int);
   var i = o as int;
@@ -375,7 +478,7 @@ void expectInteger(int matcher, String template) {
 /// object as a double [matcher].
 
 void expectDouble(double matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template));
+  var p = BinaryPropertyListReader(bytes(template), false);
   var o = p.parse();
   expect(true, o.runtimeType == double);
   var d = o as double;
@@ -386,7 +489,7 @@ void expectDouble(double matcher, String template) {
 /// object as a boolean [matcher].
 
 void expectBoolean(bool matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template));
+  var p = BinaryPropertyListReader(bytes(template), false);
   var o = p.parse();
   expect(true, o.runtimeType == bool);
   var d = o as bool;
@@ -397,7 +500,7 @@ void expectBoolean(bool matcher, String template) {
 /// object as a DateTime [matcher].
 
 void expectDate(DateTime matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template));
+  var p = BinaryPropertyListReader(bytes(template), false);
   var o = p.parse();
   expect(true, o.runtimeType == DateTime);
   var d = o as DateTime;
@@ -408,7 +511,7 @@ void expectDate(DateTime matcher, String template) {
 /// object as a ByteData [matcher].
 
 void expectData(int length, String template) {
-  var p = BinaryPropertyListReader(bytes(template));
+  var p = BinaryPropertyListReader(bytes(template), false);
   var o = p.parse();
   var d = o as ByteData;
   var b = makeData(length);

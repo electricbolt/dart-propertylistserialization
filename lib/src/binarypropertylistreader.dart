@@ -4,6 +4,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:math';
+import 'package:propertylistserialization/propertylistserialization.dart';
+
 import 'dateutil.dart';
 
 /// Implements a subset of Apple property list (plist) parser - binary format
@@ -19,15 +21,19 @@ import 'dateutil.dart';
 /// true (BOOL) -> Dart true
 /// false (BOOL) -> Dart false
 /// data (NSData) -> Dart ByteData
+///
+/// NSKeyedArchiver elements are parsed as follows:
+/// CF$UID -> Dart UID
 
 class BinaryPropertyListReader {
 
   late int _objectRefSize;
   late List<int> _offsetTable;
   final ByteData _buf;
+  final bool _keyedArchive;
 
-  BinaryPropertyListReader(ByteData buf)
-      : _buf = buf;
+  BinaryPropertyListReader(ByteData buf, bool keyedArchive)
+      : _buf = buf, _keyedArchive = keyedArchive;
 
   Object parse() {
     // CFBinaryPlistHeader
@@ -36,11 +42,11 @@ class BinaryPropertyListReader {
     }
 
     // CFBinaryPlistTrailer
-    var offsetIntSize = _buf.getInt8(_buf.lengthInBytes - 32 + 6);
-    _objectRefSize = _buf.getInt8(_buf.lengthInBytes - 32 + 7);
-    var numObjects = _buf.getInt64(_buf.lengthInBytes - 32 + 8);
-    var rootObjectId = _buf.getInt64(_buf.lengthInBytes - 32 + 16);
-    var offsetTableOffset = _buf.getInt64(_buf.lengthInBytes - 32 + 24);
+    var offsetIntSize = _buf.getUint8(_buf.lengthInBytes - 32 + 6);
+    _objectRefSize = _buf.getUint8(_buf.lengthInBytes - 32 + 7);
+    var numObjects = _buf.getUint64(_buf.lengthInBytes - 32 + 8);
+    var rootObjectId = _buf.getUint64(_buf.lengthInBytes - 32 + 16);
+    var offsetTableOffset = _buf.getUint64(_buf.lengthInBytes - 32 + 24);
 
     // Offset table
     _offsetTable = List.filled(numObjects, 0);
@@ -54,8 +60,9 @@ class BinaryPropertyListReader {
 
   Object readObject(int objectId) {
     var offset = _offsetTable[objectId];
-    var objectType = (_buf.getInt8(offset) & 0xF0) >> 4; // high nibble
-    var objectInfo = _buf.getInt8(offset) & 0x0F; // low nibble
+    var value = _buf.getUint8(offset);
+    var objectType = (value & 0xF0) >> 4; // high nibble
+    var objectInfo = value & 0x0F; // low nibble
     switch (objectType) {
       case 0x0:
         switch (objectInfo) {
@@ -106,6 +113,13 @@ class BinaryPropertyListReader {
         }
         return sb.toString();
       }
+      case 0x8: {
+        if (_keyedArchive == false) {
+          throw UnsupportedError('Unsupported plist objectType $objectType');
+        }
+        // NSKeyedArchiver CF$UID
+        return UID(_readLong(offset + 1, objectInfo + 1));
+      }
       case 0xA: {
         // array
         var lo = _readLengthOffset(offset, objectInfo);
@@ -140,7 +154,7 @@ class BinaryPropertyListReader {
     var value = 0;
     for (var i = 0; i < length; i++) {
       value <<= 8;
-      value |= (_buf.getInt8(offset + i) & 0xFF);
+      value |= (_buf.getUint8(offset + i) & 0xFF);
     }
     return value;
   }
