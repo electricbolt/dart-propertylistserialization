@@ -2,7 +2,7 @@
 // PropertyListSerialization Copyright © 2021; Electric Bolt Limited.
 
 import 'dart:typed_data';
-
+import 'package:collection/collection.dart';
 import 'package:propertylistserialization/propertylistserialization.dart';
 import 'package:propertylistserialization/src/binarypropertylistreader.dart';
 import 'package:convert/convert.dart';
@@ -87,6 +87,31 @@ void main() {
       expect(
           dict['utf16'], equals('\u0100\u0101The cow jumped over the dog\u0102'
           '\u0103'));
+    });
+
+    test('appleDict', () {
+      var template = '62706c6973743030d20102030452706b5473616c744f11010060a802f'
+          '7a085b948314b2e122f0aa6f54e5f57641999f34790ad1542fe0d7d7eb786f0a3bce'
+          'aeefbdcefd13cf24e22437f5e6a66c54ea765ed90760f212c4c87161b1ad24f6675c'
+          '0984e96cc3eda7300c6b50d0fcbdfe09cf94f340f177e161b06eb6e3ec3759544113'
+          'b64c84847c6c3c5b02c9e2b84955293a4ea99b05f55999b270033ab4e1d2965b852b'
+          'd7dec7df7939e6aa194c5a9d984d5d9a73ff856efab6d1481552106c2924defc9f1f'
+          '05830b4f4829af84c310cc1bf7d55f8f255fd662e10a0429a5484b8030c95cf01afb'
+          'a7c8d1a8eb07d39e4ed9d96d41eae21732bec4486c6565c5ee7d9ea78e7421cc2315'
+          '94c0275845dfa7610fc1f0932c76c4f10100f77fc8ab98b1b96539b266775f867870'
+          '008000d0010001501190000000000000201000000000000000500000000000000000'
+          '00000000000012c';
+
+      var p = BinaryPropertyListReader(bytes(template), false);
+      var o = p.parse();
+      expect(o.runtimeType, <String, Object>{}.runtimeType);
+      final data = o as Map<String, dynamic>;
+      expect(data.length, 2);
+
+      // data entries should not be equal
+      final ByteData pk = data['pk'];
+      final ByteData salt = data['salt'];
+      expect(ListEquality().equals(pk.buffer.asUint8List(), salt.buffer.asUint8List()), false);
     });
   });
 
