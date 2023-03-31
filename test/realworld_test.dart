@@ -8,9 +8,9 @@ import 'binarypropertylistreader_test.dart';
 
 void main() {
   test('iOSAppXMLPlist', () {
-    var template = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n'
-        '<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n'
-        '<plist version=\"1.0\">\n'
+    const template = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+        '<plist version="1.0">\n'
         '<dict>\n'
         '\t<key>CFBundleDevelopmentRegion</key>\n'
         '\t<string>en</string>\n'
@@ -128,31 +128,32 @@ void main() {
         '</dict>\n'
         '</plist>\n';
 
-    var rootDict = PropertyListSerialization.propertyListWithString(template) as
-      Map<String,Object>;
+    final rootDict = PropertyListSerialization.propertyListWithString(template)
+        as Map<String, Object>;
     expect(rootDict['CFBundleDevelopmentRegion'], equals('en'));
 
-    var docTypes = rootDict['CFBundleDocumentTypes'] as List;
-    var docTypesDict = docTypes[0] as Map<String, Object>;
-    var iconFiles = docTypesDict['CFBundleTypeIconFiles'] as List;
+    final docTypes = rootDict['CFBundleDocumentTypes'] as List;
+    final docTypesDict = docTypes[0] as Map<String, Object>;
+    final iconFiles = docTypesDict['CFBundleTypeIconFiles'] as List;
     expect(iconFiles[1], equals('DocumentIcon320.png'));
 
     expect(rootDict['UIStatusBarHidden'], equals(false));
 
-    var exportedTypeDecls = rootDict['UTExportedTypeDeclarations'] as List;
-    var exportedTypeDeclsDict = exportedTypeDecls[0] as Map<String, Object>;
-    var specsDict = exportedTypeDeclsDict['UTTypeTagSpecification'] as
-    Map<String, Object>;
-    var extensions = specsDict['public.filename-extension'] as List;
+    final exportedTypeDecls = rootDict['UTExportedTypeDeclarations'] as List;
+    final exportedTypeDeclsDict = exportedTypeDecls[0] as Map<String, Object>;
+    final specsDict =
+        exportedTypeDeclsDict['UTTypeTagSpecification'] as Map<String, Object>;
+    final extensions = specsDict['public.filename-extension'] as List;
     expect(extensions[0], equals('apc'));
 
     // Ensure serialization produces identical string as template.
-    var newStr = PropertyListSerialization.stringWithPropertyList(rootDict);
+    final newStr = PropertyListSerialization.stringWithPropertyList(rootDict);
     expect(template, equals(newStr));
   });
 
   test('iOSAppBinaryPlist', () {
-    var template = '62706c6973743030df10170102030405060708090a0b0c0d0e0f1011121'
+    const template =
+        '62706c6973743030df10170102030405060708090a0b0c0d0e0f1011121'
         '31415161718191a1b1c1d1e2d2e2f3031323439411d4243555618575c434642756e646'
         'c654e616d655f101655494c61756e636853746f7279626f6172644e616d655f1019434'
         '642756e646c65446576656c6f706d656e74526567696f6e5f100f434642756e646c655'
@@ -204,36 +205,36 @@ void main() {
         '55a056c057f059305aa05c305d505d705e305e605f305f60612061406180619061a000'
         '000000000020100000000000000580000000000000000000000000000061f';
 
-    var templateBinary = bytes(template);
+    final templateBinary = bytes(template);
 
-    var rootDict = PropertyListSerialization.propertyListWithData(
-        templateBinary) as Map<String,Object>;
+    final rootDict = PropertyListSerialization.propertyListWithData(
+      templateBinary,
+    ) as Map<String, Object>;
     expect(rootDict['CFBundleDevelopmentRegion'], equals('en'));
 
-    var docTypes = rootDict['CFBundleDocumentTypes'] as List;
-    var docTypesDict = docTypes[0] as Map<String, Object>;
-    var iconFiles = docTypesDict['CFBundleTypeIconFiles'] as List;
+    final docTypes = rootDict['CFBundleDocumentTypes'] as List;
+    final docTypesDict = docTypes[0] as Map<String, Object>;
+    final iconFiles = docTypesDict['CFBundleTypeIconFiles'] as List;
     expect(iconFiles[1], equals('DocumentIcon320.png'));
 
     expect(rootDict['UIStatusBarHidden'], equals(false));
 
-    var exportedTypeDecls = rootDict['UTExportedTypeDeclarations'] as List;
-    var exportedTypeDeclsDict = exportedTypeDecls[0] as Map<String, Object>;
-    var specsDict = exportedTypeDeclsDict['UTTypeTagSpecification'] as
-      Map<String, Object>;
-    var extensions = specsDict['public.filename-extension'] as List;
+    final exportedTypeDecls = rootDict['UTExportedTypeDeclarations'] as List;
+    final exportedTypeDeclsDict = exportedTypeDecls[0] as Map<String, Object>;
+    final specsDict =
+        exportedTypeDeclsDict['UTTypeTagSpecification'] as Map<String, Object>;
+    final extensions = specsDict['public.filename-extension'] as List;
     expect(extensions[0], equals('apc'));
 
     // Ensure serialization produces identical binary as template.
-    var newBinary = PropertyListSerialization.dataWithPropertyList(rootDict);
+    final newBinary = PropertyListSerialization.dataWithPropertyList(rootDict);
 
     expectByteData(templateBinary, newBinary);
   });
 
-  var template =
-      '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n'
+  const template = '<?xml version="1.0" encoding="UTF-8"?>\n'
       '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
-      '<plist version=\"1.0\">\n'
+      '<plist version="1.0">\n'
       '<dict>\n'
       '\t<key>DocumentWindowFrame</key>\n'
       '\t<string>{{22, -0}, {599, 1057}}</string>\n'
@@ -1232,8 +1233,7 @@ void main() {
       '\t\t<dict>\n'
       '\t\t\t<key>Identifier</key>\n';
 
-  var template2 =
-      '\t\t\t<string>SEEMode.Java</string>\n'
+  const template2 = '\t\t\t<string>SEEMode.Java</string>\n'
       '\t\t\t<key>Location</key>\n'
       '\t\t\t<string>Built-In</string>\n'
       '\t\t\t<key>Name</key>\n'
@@ -1972,12 +1972,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -2010,9 +2010,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -2135,8 +2135,7 @@ void main() {
       '\t\t\t</dict>\n'
       '\t\t</dict>\n';
 
-  var template3 =
-      '\t\t<key>FontAttributes</key>\n'
+  const template3 = '\t\t<key>FontAttributes</key>\n'
       '\t\t<dict>\n'
       '\t\t\t<key>NSFontNameAttribute</key>\n'
       '\t\t\t<string>Menlo-Regular</string>\n'
@@ -2162,12 +2161,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -2200,9 +2199,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -2400,12 +2399,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -2438,9 +2437,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -2580,12 +2579,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -2618,9 +2617,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -2768,12 +2767,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -2806,9 +2805,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -2960,12 +2959,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -2998,9 +2997,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -3137,8 +3136,7 @@ void main() {
       '\t\t<key>HighlightSyntax</key>\n'
       '\t\t<true/>\n';
 
-  var template4 =
-      '\t\t<key>IndentNewLines</key>\n'
+  const template4 = '\t\t<key>IndentNewLines</key>\n'
       '\t\t<true/>\n'
       '\t\t<key>IndentWrappedLinesCharacterAmount</key>\n'
       '\t\t<integer>4</integer>\n'
@@ -3150,12 +3148,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -3188,9 +3186,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -3338,12 +3336,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -3376,9 +3374,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -3530,12 +3528,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -3568,9 +3566,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -3718,12 +3716,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -3756,9 +3754,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -3906,12 +3904,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -3944,9 +3942,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -4098,12 +4096,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -4136,11 +4134,10 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n';
+      '\t\t\t\t<string>"</string>\n';
 
-  var template5 =
-      '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+  const template5 = '\t\t\t\t<key>open</key>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -4288,12 +4285,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -4326,9 +4323,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -4476,12 +4473,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -4514,9 +4511,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -4664,12 +4661,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -4702,9 +4699,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -4852,12 +4849,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -4890,9 +4887,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -5040,12 +5037,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -5078,9 +5075,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -5140,8 +5137,7 @@ void main() {
       '\t\t\t<key>usesMultiple</key>\n'
       '\t\t\t<false/>\n';
 
-  var template6 =
-      '\t\t</dict>\n'
+  const template6 = '\t\t</dict>\n'
       '\t\t<key>TabKeyMovesToIndent</key>\n'
       '\t\t<true/>\n'
       '\t\t<key>TabWidth</key>\n'
@@ -5230,12 +5226,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -5268,9 +5264,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -5418,12 +5414,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -5456,9 +5452,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -5606,12 +5602,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -5644,9 +5640,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -5794,12 +5790,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -5832,9 +5828,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -5982,12 +5978,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -6020,9 +6016,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -6142,8 +6138,7 @@ void main() {
       '\t\t\t\t<true/>\n'
       '\t\t\t\t<key>WrittenByHovers</key>\n';
 
-  var template7 =
-      '\t\t\t\t<true/>\n'
+  const template7 = '\t\t\t\t<true/>\n'
       '\t\t\t</dict>\n'
       '\t\t</dict>\n'
       '\t\t<key>FontAttributes</key>\n'
@@ -6172,12 +6167,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -6210,9 +6205,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -6360,12 +6355,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -6398,9 +6393,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -6548,12 +6543,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -6586,9 +6581,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -6736,12 +6731,12 @@ void main() {
       '\t\t<integer>40</integer>\n'
       '\t\t<key>SelectionModifiers</key>\n'
       '\t\t<dict>\n'
-      '\t\t\t<key>\"</key>\n'
+      '\t\t\t<key>"</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t</dict>\n'
       "\t\t\t<key>'</key>\n"
       '\t\t\t<dict>\n'
@@ -6774,9 +6769,9 @@ void main() {
       '\t\t\t<key>@</key>\n'
       '\t\t\t<dict>\n'
       '\t\t\t\t<key>close</key>\n'
-      '\t\t\t\t<string>\"</string>\n'
+      '\t\t\t\t<string>"</string>\n'
       '\t\t\t\t<key>open</key>\n'
-      '\t\t\t\t<string>@\"</string>\n'
+      '\t\t\t\t<string>@"</string>\n'
       '\t\t\t</dict>\n'
       '\t\t\t<key>[</key>\n'
       '\t\t\t<dict>\n'
@@ -7024,34 +7019,48 @@ void main() {
       '</plist>\n';
 
   test('com_panic_Coda2_XML', () {
-    var combinedTemplate = template + template2 + template3 + template4 + template5 + template6 + template7;
+    const combinedTemplate = template +
+        template2 +
+        template3 +
+        template4 +
+        template5 +
+        template6 +
+        template7;
 
-    var rootDict = PropertyListSerialization.propertyListWithString(
-      combinedTemplate) as Map<String,Object>;
+    final rootDict =
+        PropertyListSerialization.propertyListWithString(combinedTemplate)
+            as Map<String, Object>;
 
     // Convert the object graph back into a plist.
-    var newStr = PropertyListSerialization.stringWithPropertyList(rootDict);
+    final newStr = PropertyListSerialization.stringWithPropertyList(rootDict);
 
     // The newly generated plist output from dataWithPropertyList should exactly match the template string.
     expect(combinedTemplate, equals(newStr));
   });
 
   test('com_panic_Coda2_Binary', () {
-    var combinedTemplate = template + template2 + template3 + template4 + template5 + template6 + template7;
+    const combinedTemplate = template +
+        template2 +
+        template3 +
+        template4 +
+        template5 +
+        template6 +
+        template7;
 
     // Convert the plist into an object graph.
-    var rootDict = PropertyListSerialization.propertyListWithString(
-        combinedTemplate) as Map<String,Object>;
+    var rootDict =
+        PropertyListSerialization.propertyListWithString(combinedTemplate)
+            as Map<String, Object>;
 
     // Convert the object graph into a binary plist.
-    var newBuf = PropertyListSerialization.dataWithPropertyList(rootDict);
+    final newBuf = PropertyListSerialization.dataWithPropertyList(rootDict);
 
     // Convert the binary plist back into an object graph.
-    rootDict = PropertyListSerialization.propertyListWithData(newBuf) as
-      Map<String, Object>;
+    rootDict = PropertyListSerialization.propertyListWithData(newBuf)
+        as Map<String, Object>;
 
     // Convert the object graph back into a string plist.
-    var newStr = PropertyListSerialization.stringWithPropertyList(rootDict);
+    final newStr = PropertyListSerialization.stringWithPropertyList(rootDict);
 
     // The newly generated plist output from dataWithPropertyList should exactly
     // match the template string.
@@ -7060,5 +7069,4 @@ void main() {
           'newStr.length=${newStr.length}');
     }
   });
-
 }

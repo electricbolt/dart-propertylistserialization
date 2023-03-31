@@ -1,3 +1,8 @@
+#### 1.2.1
+- Added additional unit-test for binary property list deserialization.
+- Updated dependencies in pubspec.yaml.
+- Updated README.md.
+
 #### 1.2.0
 - Added support for reading NSKeyedArchiver CF$UID constructs from a binary plist.
 

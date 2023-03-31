@@ -58,7 +58,7 @@ try {
 
 #### Result
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -111,7 +111,7 @@ try {
 
 #### Result
 
-```
+```text
 62 70 6c 69 73 74 30 30 a1 01 d3 02 03 04 05 06
 07 58 49 63 6f 6e 4e 61 6d 65 58 49 63 6f 6e 53
 69 7a 65 58 53 65 6c 65 63 74 65 64 5d 6c 61 72
@@ -210,6 +210,7 @@ static ByteData dataWithPropertyList(Object obj);
 ```
 
 For the object graph provided, returns a property list as a binary `ByteData`. Equivalent to iOS method `[NSPropertyList dataWithPropertyList:format:options:error]`
+*Hint:* To convert any returned ByteData objects into a Uint8List, you should use the following pattern: `data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);`
 
 **params** *obj* - The object graph to write out as a binary property list. The object graph may only contain the following types: `String`, `int`, `Float32`, `double`, `Map<String, Object>`, `List`, `DateTime`, `bool` or `ByteData`.
 
@@ -226,6 +227,7 @@ static Object propertyListWithData(ByteData data, {bool keyedArchive = false});
 ```
 
 Creates and returns an object graph from the specified property list binary `ByteData`. Equivalent to iOS method `[NSPropertyList propertyListWithData:options:format:error]`
+*Hint:* To convert any returned ByteData objects into a Uint8List, you should use the following pattern: `data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);`
 
 **params** *data* - `ByteData` of binary plist.
 **params** *keyedArchive* - `bool` - if true then deserialization also supports CF$UID constructs and returns it as a UID object.

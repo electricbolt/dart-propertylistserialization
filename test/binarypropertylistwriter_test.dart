@@ -3,26 +3,25 @@
 
 import 'dart:typed_data';
 
+import 'package:convert/convert.dart';
 import 'package:propertylistserialization/propertylistserialization.dart';
 import 'package:propertylistserialization/src/binarypropertylistreader.dart';
 import 'package:propertylistserialization/src/binarypropertylistwriter.dart';
 import 'package:test/test.dart';
-import 'package:convert/convert.dart';
 
 import 'binarypropertylistreader_test.dart';
 
 void main() {
-
   test('ByteDataWrapper', () {
     // Test that the internal ByteDataWrapper class performs equality and
     // hashCode across the entire array of bytes contained within. (Unlike
     // ByteData which simply compares for equivalent object references).
-    var b1 = bytes('62706c6973');
-    var b2 = bytes('62706c6973');
-    var b3 = bytes('62757cd3fa');
-    var bw1 = ByteDataWrapper(b1);
-    var bw2 = ByteDataWrapper(b2);
-    var bw3 = ByteDataWrapper(b3);
+    final b1 = bytes('62706c6973');
+    final b2 = bytes('62706c6973');
+    final b3 = bytes('62757cd3fa');
+    final bw1 = ByteDataWrapper(b1);
+    final bw2 = ByteDataWrapper(b2);
+    final bw3 = ByteDataWrapper(b3);
 
     if (bw1 != bw2) {
       fail('bw1 should equal bw2');
@@ -31,31 +30,37 @@ void main() {
       fail('bw1 should not equal bw3');
     }
 
-    var map = <ByteDataWrapper, ByteDataWrapper>{};
+    final map = <ByteDataWrapper, ByteDataWrapper>{};
     map[bw1] = bw1;
     map[bw2] = bw2;
     expect(map.length, equals(1));
-    expect(hex.encoder.convert(Uint8List.sublistView(map[bw1]!.value)),
-        equals('62706c6973'));
+    expect(
+      hex.encoder.convert(Uint8List.sublistView(map[bw1]!.value)),
+      equals('62706c6973'),
+    );
 
     map[bw3] = bw3;
     expect(map.length, equals(2));
-    expect(hex.encoder.convert(Uint8List.sublistView(map[bw3]!.value)),
-      equals('62757cd3fa'));
+    expect(
+      hex.encoder.convert(Uint8List.sublistView(map[bw3]!.value)),
+      equals('62757cd3fa'),
+    );
   });
 
   group('array', () {
     test('emptyArray', () {
-      var xcodeTemplate = '62706c6973743030a00800000000000001010000000000000001'
+      const xcodeTemplate =
+          '62706c6973743030a00800000000000001010000000000000001'
           '00000000000000000000000000000009';
 
-      var p = BinaryPropertyListWriter(<String>[]);
-      var g = p.write();
+      final p = BinaryPropertyListWriter(<String>[]);
+      final g = p.write();
       expectByteData(g, bytes(xcodeTemplate));
     });
 
     test('filledArray', () {
-      var xcodeTemplate = '62706c6973743030aa0102030405060708090a1000223fc00000'
+      const xcodeTemplate =
+          '62706c6973743030aa0102030405060708090a1000223fc00000'
           '23400400000000000009084500010203044f1014000102030405060708090a0b0c0d'
           '0e0f1011121333c1e9fc3af0e000005f101b54686520636f77206a756d706564206f'
           '7665722074686520646f676f101f0100010100540068006500200063006f00770020'
@@ -63,7 +68,7 @@ void main() {
           '006f0067010201030813151a2324252b424b69000000000000010100000000000000'
           '0b000000000000000000000000000000aa';
 
-      var list = [];
+      final list = [];
       list.add(0);
       list.add(Float32(1.5));
       list.add(2.5);
@@ -75,33 +80,35 @@ void main() {
       list.add('The cow jumped over the dog');
       list.add('\u0100\u0101The cow jumped over the dog\u0102\u0103');
 
-      var p = BinaryPropertyListWriter(list);
-      var g = p.write();
+      final p = BinaryPropertyListWriter(list);
+      final g = p.write();
       expectByteData(g, bytes(xcodeTemplate));
     });
   });
 
   group('dict', () {
     test('emptyDict', () {
-      var xcodeTemplate = '62706c6973743030d00800000000000001010000000000000001'
+      const xcodeTemplate =
+          '62706c6973743030d00800000000000001010000000000000001'
           '00000000000000000000000000000009';
 
-      var p = BinaryPropertyListWriter(<String, Object>{});
-      var g = p.write();
+      final p = BinaryPropertyListWriter(<String, Object>{});
+      final g = p.write();
       expectByteData(g, bytes(xcodeTemplate));
     });
 
     // Dict
 
     test('dictInteger25', () {
-      var xcodeTemplate = '62706c6973743030d1010253696e741019080b0f000000000000'
+      const xcodeTemplate =
+          '62706c6973743030d1010253696e741019080b0f000000000000'
           '0101000000000000000300000000000000000000000000000011';
 
-      var dict = <String, int>{};
+      final dict = <String, int>{};
       dict['int'] = 25;
 
-      var p = BinaryPropertyListWriter(dict);
-      var g = p.write();
+      final p = BinaryPropertyListWriter(dict);
+      final g = p.write();
       expectByteData(g, bytes(xcodeTemplate));
     });
 
@@ -118,8 +125,8 @@ void main() {
       dict['ascii'] = 'The cow jumped over the dog';
       dict['utf16'] = '\u0100\u0101The cow jumped over the dog\u0102\u0103';
 
-      var p = BinaryPropertyListWriter(dict);
-      var g = p.write();
+      final p = BinaryPropertyListWriter(dict);
+      final g = p.write();
 
       // Can't test against the string template, since the order of the
       // dictionaries is undefined in binary plists (as opposed to xml plists
@@ -135,11 +142,13 @@ void main() {
       //     '797abbc4c5cad0000000000000010100000000000000150000000000000000000'
       //     '00000000000ee';
 
-      expect(g.lengthInBytes,
-          291); // the length will be identical to the xcodeTemplate above.
+      expect(
+        g.lengthInBytes,
+        291,
+      ); // the length will be identical to the xcodeTemplate above.
 
-      var q = BinaryPropertyListReader(g, false);
-      var o = q.parse();
+      final q = BinaryPropertyListReader(g, keyedArchive: false);
+      final o = q.parse();
       expect(o.runtimeType, <String, Object>{}.runtimeType);
       dict = o as Map<String, Object>;
       expect(dict.length, equals(10));
@@ -150,208 +159,339 @@ void main() {
       expect(dict['false'], equals(false));
       expectByteData(dict['data5'] as ByteData, makeData(5));
       expectByteData(dict['data20'] as ByteData, makeData(20));
-      expect(dict['date'], equals(DateTime.utc(1890, DateTime.june, 25, 06, 45,
-          13)));
+      expect(
+        dict['date'],
+        equals(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13)),
+      );
       expect(dict['ascii'], equals('The cow jumped over the dog'));
       expect(
-          dict['utf16'], equals('\u0100\u0101The cow jumped over the dog\u0102'
-          '\u0103'));
+        dict['utf16'],
+        equals('\u0100\u0101The cow jumped over the dog\u0102'
+            '\u0103'),
+      );
     });
   });
 
   group('string', () {
     test('asciiString', () {
-      testString('',
+      testString(
+          '',
           '62706c69737430305008000000000000010100000000000000010000000000000000'
-          '0000000000000009');
+              '0000000000000009');
       testString(
-          ' ', '62706c697374303051200800000000000001010000000000000001000000000'
-          '0000000000000000000000a');
+          ' ',
+          '62706c697374303051200800000000000001010000000000000001000000000'
+              '0000000000000000000000a');
       testString(
-          'The dog jumped over the moon', '62706c69737430305f101c54686520646f67'
-          '206a756d706564206f76657220746865206d6f6f6e08000000000000010100000000'
-          '0000000100000000000000000000000000000027');
+          'The dog jumped over the moon',
+          '62706c69737430305f101c54686520646f67'
+              '206a756d706564206f76657220746865206d6f6f6e08000000000000010100000000'
+              '0000000100000000000000000000000000000027');
     });
 
     test('unicodeString', () {
       testString(
-          'Ā', '62706c697374303061010008000000000000010100000000000000010000000'
-          '000000000000000000000000b');
+          'Ā',
+          '62706c697374303061010008000000000000010100000000000000010000000'
+              '000000000000000000000000b');
       testString(
-          'Āā', '62706c69737430306201000101080000000000000101000000000000000100'
-          '00000000000000000000000000000d');
+          'Āā',
+          '62706c69737430306201000101080000000000000101000000000000000100'
+              '00000000000000000000000000000d');
       testString(
-          'ĀāThe cow jumped over the dogĂă', '62706c69737430306f101f01000101005'
-          '40068006500200063006f00770020006a0075006d0070006500640020006f0076006'
-          '50072002000740068006500200064006f00670102010308000000000000010100000'
-          '0000000000100000000000000000000000000000049');
+          'ĀāThe cow jumped over the dogĂă',
+          '62706c69737430306f101f01000101005'
+              '40068006500200063006f00770020006a0075006d0070006500640020006f0076006'
+              '50072002000740068006500200064006f00670102010308000000000000010100000'
+              '0000000000100000000000000000000000000000049');
     });
   });
 
   // Integer
 
   test('integer', () {
-    testInteger(0, '62706c69737430301000080000000000000101000000000000000100000'
+    testInteger(
+        0,
+        '62706c69737430301000080000000000000101000000000000000100000'
         '00000000000000000000000000a');
-    testInteger(1, '62706c69737430301001080000000000000101000000000000000100000'
+    testInteger(
+        1,
+        '62706c69737430301001080000000000000101000000000000000100000'
         '00000000000000000000000000a');
-    testInteger(126, '62706c6973743030107e0800000000000001010000000000000001000'
+    testInteger(
+        126,
+        '62706c6973743030107e0800000000000001010000000000000001000'
         '0000000000000000000000000000a');
-    testInteger(127, '62706c6973743030107f0800000000000001010000000000000001000'
+    testInteger(
+        127,
+        '62706c6973743030107f0800000000000001010000000000000001000'
         '0000000000000000000000000000a');
-    testInteger(128, '62706c697374303010800800000000000001010000000000000001000'
+    testInteger(
+        128,
+        '62706c697374303010800800000000000001010000000000000001000'
         '0000000000000000000000000000a');
-    testInteger(254, '62706c697374303010fe0800000000000001010000000000000001000'
+    testInteger(
+        254,
+        '62706c697374303010fe0800000000000001010000000000000001000'
         '0000000000000000000000000000a');
-    testInteger(255, '62706c697374303010ff0800000000000001010000000000000001000'
+    testInteger(
+        255,
+        '62706c697374303010ff0800000000000001010000000000000001000'
         '0000000000000000000000000000a');
-    testInteger(256, '62706c697374303011010008000000000000010100000000000000010'
+    testInteger(
+        256,
+        '62706c697374303011010008000000000000010100000000000000010'
         '000000000000000000000000000000b');
-    testInteger(32766, '62706c6973743030117ffe080000000000000101000000000000000'
+    testInteger(
+        32766,
+        '62706c6973743030117ffe080000000000000101000000000000000'
         '10000000000000000000000000000000b');
-    testInteger(32767, '62706c6973743030117fff080000000000000101000000000000000'
+    testInteger(
+        32767,
+        '62706c6973743030117fff080000000000000101000000000000000'
         '10000000000000000000000000000000b');
-    testInteger(32768, '62706c6973743030118000080000000000000101000000000000000'
+    testInteger(
+        32768,
+        '62706c6973743030118000080000000000000101000000000000000'
         '10000000000000000000000000000000b');
-    testInteger(65534, '62706c697374303011fffe080000000000000101000000000000000'
+    testInteger(
+        65534,
+        '62706c697374303011fffe080000000000000101000000000000000'
         '10000000000000000000000000000000b');
-    testInteger(65535, '62706c697374303011ffff080000000000000101000000000000000'
+    testInteger(
+        65535,
+        '62706c697374303011ffff080000000000000101000000000000000'
         '10000000000000000000000000000000b');
-    testInteger(65536, '62706c6973743030120001000008000000000000010100000000000'
+    testInteger(
+        65536,
+        '62706c6973743030120001000008000000000000010100000000000'
         '000010000000000000000000000000000000d');
-    testInteger(2147483646, '62706c6973743030127ffffffe080000000000000101000000'
+    testInteger(
+        2147483646,
+        '62706c6973743030127ffffffe080000000000000101000000'
         '00000000010000000000000000000000000000000d');
-    testInteger(2147483647, '62706c6973743030127fffffff080000000000000101000000'
+    testInteger(
+        2147483647,
+        '62706c6973743030127fffffff080000000000000101000000'
         '00000000010000000000000000000000000000000d');
-    testInteger(2147483648, '62706c69737430301280000000080000000000000101000000'
+    testInteger(
+        2147483648,
+        '62706c69737430301280000000080000000000000101000000'
         '00000000010000000000000000000000000000000d');
-    testInteger(9223372036854775806, '62706c6973743030137ffffffffffffffe0800000'
+    testInteger(
+        9223372036854775806,
+        '62706c6973743030137ffffffffffffffe0800000'
         '00000000101000000000000000100000000000000000000000000000011');
-    testInteger(9223372036854775807, '62706c6973743030137fffffffffffffff0800000'
+    testInteger(
+        9223372036854775807,
+        '62706c6973743030137fffffffffffffff0800000'
         '00000000101000000000000000100000000000000000000000000000011');
 
     // negative
-    testInteger(-1, '62706c697374303013ffffffffffffffff080000000000000101000000'
+    testInteger(
+        -1,
+        '62706c697374303013ffffffffffffffff080000000000000101000000'
         '000000000100000000000000000000000000000011');
-    testInteger(-127, '62706c697374303013ffffffffffffff810800000000000001010000'
+    testInteger(
+        -127,
+        '62706c697374303013ffffffffffffff810800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    testInteger(-128, '62706c697374303013ffffffffffffff800800000000000001010000'
+    testInteger(
+        -128,
+        '62706c697374303013ffffffffffffff800800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    testInteger(-129, '62706c697374303013ffffffffffffff7f0800000000000001010000'
+    testInteger(
+        -129,
+        '62706c697374303013ffffffffffffff7f0800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    testInteger(-255, '62706c697374303013ffffffffffffff010800000000000001010000'
+    testInteger(
+        -255,
+        '62706c697374303013ffffffffffffff010800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    testInteger(-256, '62706c697374303013ffffffffffffff000800000000000001010000'
+    testInteger(
+        -256,
+        '62706c697374303013ffffffffffffff000800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    testInteger(-257, '62706c697374303013fffffffffffffeff0800000000000001010000'
+    testInteger(
+        -257,
+        '62706c697374303013fffffffffffffeff0800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    testInteger(-32767, '62706c697374303013ffffffffffff800108000000000000010100'
+    testInteger(
+        -32767,
+        '62706c697374303013ffffffffffff800108000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    testInteger(-32768, '62706c697374303013ffffffffffff800008000000000000010100'
+    testInteger(
+        -32768,
+        '62706c697374303013ffffffffffff800008000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    testInteger(-32769, '62706c697374303013ffffffffffff7fff08000000000000010100'
+    testInteger(
+        -32769,
+        '62706c697374303013ffffffffffff7fff08000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    testInteger(-65534, '62706c697374303013ffffffffffff000208000000000000010100'
+    testInteger(
+        -65534,
+        '62706c697374303013ffffffffffff000208000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    testInteger(-65535, '62706c697374303013ffffffffffff000108000000000000010100'
+    testInteger(
+        -65535,
+        '62706c697374303013ffffffffffff000108000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    testInteger(-65536, '62706c697374303013ffffffffffff000008000000000000010100'
+    testInteger(
+        -65536,
+        '62706c697374303013ffffffffffff000008000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    testInteger(-2147483647, '62706c697374303013ffffffff80000001080000000000000'
+    testInteger(
+        -2147483647,
+        '62706c697374303013ffffffff80000001080000000000000'
         '101000000000000000100000000000000000000000000000011');
-    testInteger(-2147483648, '62706c697374303013ffffffff80000000080000000000000'
+    testInteger(
+        -2147483648,
+        '62706c697374303013ffffffff80000000080000000000000'
         '101000000000000000100000000000000000000000000000011');
-    testInteger(-2147483649, '62706c697374303013ffffffff7fffffff080000000000000'
+    testInteger(
+        -2147483649,
+        '62706c697374303013ffffffff7fffffff080000000000000'
         '101000000000000000100000000000000000000000000000011');
-    testInteger(-9223372036854775807, '62706c6973743030138000000000000001080000'
+    testInteger(
+        -9223372036854775807,
+        '62706c6973743030138000000000000001080000'
         '000000000101000000000000000100000000000000000000000000000011');
-    testInteger(-9223372036854775808, '62706c6973743030138000000000000000080000'
+    testInteger(
+        -9223372036854775808,
+        '62706c6973743030138000000000000000080000'
         '000000000101000000000000000100000000000000000000000000000011');
   });
 
   test('real', () {
-    testFloat(0.0, '62706c69737430302200000000080000000000000101000000000000000'
+    testFloat(
+        0.0,
+        '62706c69737430302200000000080000000000000101000000000000000'
         '10000000000000000000000000000000d');
-    testFloat(1.0, '62706c6973743030223f800000080000000000000101000000000000000'
+    testFloat(
+        1.0,
+        '62706c6973743030223f800000080000000000000101000000000000000'
         '10000000000000000000000000000000d');
-    testFloat(2.5, '62706c69737430302240200000080000000000000101000000000000000'
+    testFloat(
+        2.5,
+        '62706c69737430302240200000080000000000000101000000000000000'
         '10000000000000000000000000000000d');
-    testFloat(987654321.12345, '62706c6973743030224e6b79a3080000000000000101000'
+    testFloat(
+        987654321.12345,
+        '62706c6973743030224e6b79a3080000000000000101000'
         '00000000000010000000000000000000000000000000d');
-    testFloat(-1.0, '62706c697374303022bf80000008000000000000010100000000000000'
+    testFloat(
+        -1.0,
+        '62706c697374303022bf80000008000000000000010100000000000000'
         '010000000000000000000000000000000d');
-    testFloat(-2.5, '62706c697374303022c020000008000000000000010100000000000000'
+    testFloat(
+        -2.5,
+        '62706c697374303022c020000008000000000000010100000000000000'
         '010000000000000000000000000000000d');
-    testFloat(-987654321.12345, '62706c697374303022ce6b79a308000000000000010100'
+    testFloat(
+        -987654321.12345,
+        '62706c697374303022ce6b79a308000000000000010100'
         '000000000000010000000000000000000000000000000d');
 
-    testDouble(0.0, '62706c6973743030230000000000000000080000000000000101000000'
+    testDouble(
+        0.0,
+        '62706c6973743030230000000000000000080000000000000101000000'
         '000000000100000000000000000000000000000011');
-    testDouble(1.0, '62706c6973743030233ff0000000000000080000000000000101000000'
+    testDouble(
+        1.0,
+        '62706c6973743030233ff0000000000000080000000000000101000000'
         '000000000100000000000000000000000000000011');
-    testDouble(2.5, '62706c6973743030234004000000000000080000000000000101000000'
+    testDouble(
+        2.5,
+        '62706c6973743030234004000000000000080000000000000101000000'
         '000000000100000000000000000000000000000011');
-    testDouble(987654321.12345, '62706c69737430302341cd6f34588fcd36080000000000'
+    testDouble(
+        987654321.12345,
+        '62706c69737430302341cd6f34588fcd36080000000000'
         '000101000000000000000100000000000000000000000000000011');
-    testDouble(-1.0, '62706c697374303023bff000000000000008000000000000010100000'
+    testDouble(
+        -1.0,
+        '62706c697374303023bff000000000000008000000000000010100000'
         '0000000000100000000000000000000000000000011');
-    testDouble(-2.5, '62706c697374303023c00400000000000008000000000000010100000'
+    testDouble(
+        -2.5,
+        '62706c697374303023c00400000000000008000000000000010100000'
         '0000000000100000000000000000000000000000011');
-    testDouble(-987654321.12345, '62706c697374303023c1cd6f34588fcd3608000000000'
+    testDouble(
+        -987654321.12345,
+        '62706c697374303023c1cd6f34588fcd3608000000000'
         '0000101000000000000000100000000000000000000000000000011');
   });
 
   group('boolean', () {
     test('true', () {
-      var xcodeTemplate = '62706c6973743030090800000000000001010000000000000001'
+      const xcodeTemplate =
+          '62706c6973743030090800000000000001010000000000000001'
           '00000000000000000000000000000009';
-      var p = BinaryPropertyListWriter(true);
-      var g = p.write();
+      final p = BinaryPropertyListWriter(true);
+      final g = p.write();
       expectByteData(bytes(xcodeTemplate), g);
     });
 
     test('false', () {
-      var xcodeTemplate = '62706c6973743030080800000000000001010000000000000001'
+      const xcodeTemplate =
+          '62706c6973743030080800000000000001010000000000000001'
           '00000000000000000000000000000009';
-      var p = BinaryPropertyListWriter(false);
-      var g = p.write();
+      final p = BinaryPropertyListWriter(false);
+      final g = p.write();
       expectByteData(bytes(xcodeTemplate), g);
     });
   });
 
-  test('date', ()
-  {
-    testDate(DateTime.utc(1970, DateTime.january, 1, 12, 0, 0),
+  test('date', () {
+    testDate(
+        DateTime.utc(1970, DateTime.january, 1, 12, 0, 0),
         '62706c697374303033c1cd278fe0000000080000000000000101000000000000000100'
         '000000000000000000000000000011');
-    testDate(DateTime.utc(1890, DateTime.june, 25, 6, 45, 13),
+    testDate(
+        DateTime.utc(1890, DateTime.june, 25, 6, 45, 13),
         '62706c697374303033c1e9fc3af0e00000080000000000000101000000000000000100'
         '000000000000000000000000000011');
-    testDate(DateTime.utc(2019, DateTime.november, 4, 14, 22, 59),
+    testDate(
+        DateTime.utc(2019, DateTime.november, 4, 14, 22, 59),
         '62706c69737430303341c1b835e1800000080000000000000101000000000000000100'
         '000000000000000000000000000011');
   });
 
-  test('data', ()
-  {
-    testData(0, '62706c69737430304008000000000000010100000000000000010000000000'
+  test('data', () {
+    testData(
+        0,
+        '62706c69737430304008000000000000010100000000000000010000000000'
         '0000000000000000000009');
-    testData(1, '62706c69737430304100080000000000000101000000000000000100000000'
+    testData(
+        1,
+        '62706c69737430304100080000000000000101000000000000000100000000'
         '00000000000000000000000a');
-    testData(2, '62706c69737430304200010800000000000001010000000000000001000000'
+    testData(
+        2,
+        '62706c69737430304200010800000000000001010000000000000001000000'
         '0000000000000000000000000b');
-    testData(14, '62706c69737430304e000102030405060708090a0b0c0d080000000000000'
+    testData(
+        14,
+        '62706c69737430304e000102030405060708090a0b0c0d080000000000000'
         '101000000000000000100000000000000000000000000000017');
-    testData(15, '62706c69737430304f100f000102030405060708090a0b0c0d0e080000000'
+    testData(
+        15,
+        '62706c69737430304f100f000102030405060708090a0b0c0d0e080000000'
         '00000010100000000000000010000000000000000000000000000001a');
-    testData(16, '62706c69737430304f1010000102030405060708090a0b0c0d0e0f0800000'
+    testData(
+        16,
+        '62706c69737430304f1010000102030405060708090a0b0c0d0e0f0800000'
         '0000000010100000000000000010000000000000000000000000000001b');
-    testData(100, '62706c69737430304f1064000102030405060708090a0b0c0d0e0f101112'
+    testData(
+        100,
+        '62706c69737430304f1064000102030405060708090a0b0c0d0e0f101112'
         '131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435'
         '363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758'
         '595a5b5c5d5e5f60616263080000000000000101000000000000000100000000000000'
         '00000000000000006f');
-    testData(1000, '62706c69737430304f1103e8000102030405060708090a0b0c0d0e0f101'
+    testData(
+        1000,
+        '62706c69737430304f1103e8000102030405060708090a0b0c0d0e0f101'
         '112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333'
         '435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565'
         '758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797'
@@ -386,37 +526,37 @@ void main() {
 }
 
 void testData(int len, String xcodeTemplate) {
-  var p = BinaryPropertyListWriter(makeData(len));
-  var g = p.write();
+  final p = BinaryPropertyListWriter(makeData(len));
+  final g = p.write();
   expectByteData(bytes(xcodeTemplate), g);
 }
 
 void testDate(DateTime value, String xcodeTemplate) {
-  var p = BinaryPropertyListWriter(value);
-  var g = p.write();
+  final p = BinaryPropertyListWriter(value);
+  final g = p.write();
   expectByteData(bytes(xcodeTemplate), g);
 }
 
 void testInteger(int value, String xcodeTemplate) {
-  var p = BinaryPropertyListWriter(value);
-  var g = p.write();
+  final p = BinaryPropertyListWriter(value);
+  final g = p.write();
   expectByteData(bytes(xcodeTemplate), g);
 }
 
 void testFloat(double value, String xcodeTemplate) {
-  var p = BinaryPropertyListWriter(Float32(value));
-  var g = p.write();
+  final p = BinaryPropertyListWriter(Float32(value));
+  final g = p.write();
   expectByteData(bytes(xcodeTemplate), g);
 }
 
 void testDouble(double value, String xcodeTemplate) {
-  var p = BinaryPropertyListWriter(value);
-  var g = p.write();
+  final p = BinaryPropertyListWriter(value);
+  final g = p.write();
   expectByteData(bytes(xcodeTemplate), g);
 }
 
 void testString(String actual, String xcodeTemplate) {
-  var p = BinaryPropertyListWriter(actual);
-  var g = p.write();
+  final p = BinaryPropertyListWriter(actual);
+  final g = p.write();
   expectByteData(bytes(xcodeTemplate), g);
 }

@@ -3,35 +3,37 @@
 
 import 'dart:typed_data';
 
+import 'package:convert/convert.dart';
 import 'package:propertylistserialization/propertylistserialization.dart';
 import 'package:propertylistserialization/src/binarypropertylistreader.dart';
-import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('array', () {
     test('emptyArray', () {
-      var template = '62706c6973743030a0080000000000000101000000000000000100000'
+      const template =
+          '62706c6973743030a0080000000000000101000000000000000100000'
           '000000000000000000000000009';
-      var p = BinaryPropertyListReader(bytes(template), false);
-      var o = p.parse();
+      final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+      final o = p.parse();
       expect(o.runtimeType, <Object>[].runtimeType);
-      var list = o as List<Object>;
+      final list = o as List<Object>;
       expect(list.length, equals(0));
     });
 
     test('filledArray', () {
-      var template = '62706c6973743030aa0102030405060708090a1000223fc0000023400'
+      const template =
+          '62706c6973743030aa0102030405060708090a1000223fc0000023400'
           '400000000000009084500010203044f1014000102030405060708090a0b0c0d0e0f1'
           '011121333c1e9fc3af0e000005f101b54686520636f77206a756d706564206f76657'
           '22074686520646f676f101f0100010100540068006500200063006f00770020006a0'
           '075006d0070006500640020006f007600650072002000740068006500200064006f0'
           '067010201030813151a2324252b424b690000000000000101000000000000000b000'
           '000000000000000000000000000aa';
-      var p = BinaryPropertyListReader(bytes(template), false);
-      var o = p.parse();
+      final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+      final o = p.parse();
       expect(o.runtimeType, <Object>[].runtimeType);
-      var list = o as List<Object>;
+      final list = o as List<Object>;
       expect(list.length, equals(10));
       expect(list[0], equals(0));
       expect(list[1], equals(1.5));
@@ -41,26 +43,33 @@ void main() {
       expectByteData(list[5] as ByteData, makeData(5));
       expectByteData(list[6] as ByteData, makeData(20));
       expect(
-          list[7], equals(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13)));
+        list[7],
+        equals(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13)),
+      );
       expect(list[8], equals('The cow jumped over the dog'));
-      expect(list[9], equals('\u0100\u0101The cow jumped over the dog\u0102'
-          '\u0103'));
+      expect(
+        list[9],
+        equals('\u0100\u0101The cow jumped over the dog\u0102'
+            '\u0103'),
+      );
     });
   });
 
   group('dict', () {
     test('emptyDict', () {
-      var template = '62706c6973743030d0080000000000000101000000000000000100000'
+      const template =
+          '62706c6973743030d0080000000000000101000000000000000100000'
           '000000000000000000000000009';
-      var p = BinaryPropertyListReader(bytes(template), false);
-      var o = p.parse();
+      final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+      final o = p.parse();
       expect(o.runtimeType, <String, Object>{}.runtimeType);
-      var dict = o as Map<String, Object>;
+      final dict = o as Map<String, Object>;
       expect(dict.length, equals(0));
     });
 
     test('filledDict', () {
-      var template = '62706c6973743030da0102030405060708090a0b0c0d0e0f101112131'
+      const template =
+          '62706c6973743030da0102030405060708090a0b0c0d0e0f101112131'
           '45664617461323056646f75626c6553696e745566616c73655575746631365464617'
           '465547472756555666c6f61745564617461355561736369694f10140001020304050'
           '60708090a0b0c0d0e0f101112132340040000000000001000086f101f01000101005'
@@ -69,10 +78,10 @@ void main() {
           'fc000004500010203045f101b54686520636f77206a756d706564206f76657220746'
           '86520646f67081d242b2f353b40454b51576e77797abbc4c5cad0000000000000010'
           '10000000000000015000000000000000000000000000000ee';
-      var p = BinaryPropertyListReader(bytes(template), false);
-      var o = p.parse();
+      final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+      final o = p.parse();
       expect(o.runtimeType, <String, Object>{}.runtimeType);
-      var dict = o as Map<String, Object>;
+      final dict = o as Map<String, Object>;
       expect(dict.length, equals(10));
       expect(dict['int'], equals(0));
       expect(dict['float'], equals(1.5));
@@ -81,12 +90,53 @@ void main() {
       expect(dict['false'], equals(false));
       expectByteData(dict['data5'] as ByteData, makeData(5));
       expectByteData(dict['data20'] as ByteData, makeData(20));
-      expect(dict['date'], equals(DateTime.utc(1890, DateTime.june, 25, 06, 45,
-          13)));
+      expect(
+        dict['date'],
+        equals(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13)),
+      );
       expect(dict['ascii'], equals('The cow jumped over the dog'));
       expect(
-          dict['utf16'], equals('\u0100\u0101The cow jumped over the dog\u0102'
-          '\u0103'));
+        dict['utf16'],
+        equals('\u0100\u0101The cow jumped over the dog\u0102'
+            '\u0103'),
+      );
+    });
+
+    test('issue#4', () {
+      const template =
+          '62706c6973743030d20102030452706b5473616c744f11010060a802f'
+          '7a085b948314b2e122f0aa6f54e5f57641999f34790ad1542fe0d7d7eb786f0a3bce'
+          'aeefbdcefd13cf24e22437f5e6a66c54ea765ed90760f212c4c87161b1ad24f6675c'
+          '0984e96cc3eda7300c6b50d0fcbdfe09cf94f340f177e161b06eb6e3ec3759544113'
+          'b64c84847c6c3c5b02c9e2b84955293a4ea99b05f55999b270033ab4e1d2965b852b'
+          'd7dec7df7939e6aa194c5a9d984d5d9a73ff856efab6d1481552106c2924defc9f1f'
+          '05830b4f4829af84c310cc1bf7d55f8f255fd662e10a0429a5484b8030c95cf01afb'
+          'a7c8d1a8eb07d39e4ed9d96d41eae21732bec4486c6565c5ee7d9ea78e7421cc2315'
+          '94c0275845dfa7610fc1f0932c76c4f10100f77fc8ab98b1b96539b266775f867870'
+          '008000d0010001501190000000000000201000000000000000500000000000000000'
+          '00000000000012c';
+      const pkTemplate =
+          '60a802f7a085b948314b2e122f0aa6f54e5f57641999f34790ad154'
+          '2fe0d7d7eb786f0a3bceaeefbdcefd13cf24e22437f5e6a66c54ea765ed90760f212'
+          'c4c87161b1ad24f6675c0984e96cc3eda7300c6b50d0fcbdfe09cf94f340f177e161'
+          'b06eb6e3ec3759544113b64c84847c6c3c5b02c9e2b84955293a4ea99b05f55999b2'
+          '70033ab4e1d2965b852bd7dec7df7939e6aa194c5a9d984d5d9a73ff856efab6d148'
+          '1552106c2924defc9f1f05830b4f4829af84c310cc1bf7d55f8f255fd662e10a0429'
+          'a5484b8030c95cf01afba7c8d1a8eb07d39e4ed9d96d41eae21732bec4486c6565c5'
+          'ee7d9ea78e7421cc231594c0275845dfa7610fc1f0932c76c';
+      const saltTemplate = '0f77fc8ab98b1b96539b266775f86787';
+
+      final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+      final o = p.parse();
+      expect(o.runtimeType, <String, Object>{}.runtimeType);
+      final data = o as Map<String, dynamic>;
+      expect(data.length, 2);
+
+      final ByteData pk = data['pk'] as ByteData;
+      expectByteData(pk, bytes(pkTemplate));
+
+      final ByteData salt = data['salt'] as ByteData;
+      expectByteData(salt, bytes(saltTemplate));
     });
   });
 
@@ -146,7 +196,8 @@ void main() {
     // </plist>
 
     test('issue#2', () {
-      var template = '62706c6973743030d4010203040506070a582476657273696f6e59246'
+      const template =
+          '62706c6973743030d4010203040506070a582476657273696f6e59246'
           '1726368697665725424746f7058246f626a6563747312000186a05f100f4e534b657'
           '965644172636869766572d1080954726f6f748001a50b0c13141555246e756c6cd20'
           'd0e0f125a4e532e6f626a656374735624636c617373a2101180028003800423402e0'
@@ -156,37 +207,39 @@ void main() {
           'b000000000000000000000000000000be';
       // Test that when keyedArchive = false throws an UnsupportedError when
       // CF$UID construct is read.
-      var p = BinaryPropertyListReader(bytes(template), false);
+      var p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
       try {
         p.parse();
-        throw new Exception('Expected UnsupportedError');
-      } on UnsupportedError {
+        throw Exception('Expected UnsupportedError');
+        // ignore:avoid_catching_errors
+      } on UnsupportedError catch (e) {
+        expect(e.message, equals('Unsupported plist objectType 8'));
       }
 
-      p = BinaryPropertyListReader(bytes(template), true);
-      var o = p.parse();
+      p = BinaryPropertyListReader(bytes(template), keyedArchive: true);
+      final o = p.parse();
       expect(o.runtimeType, <String, Object>{}.runtimeType);
-      var dict = o as Map<String, Object>;
+      final dict = o as Map<String, Object>;
 
       expect(dict.length, equals(4));
       expect(dict[r'$version'], equals(100000));
       expect(dict[r'$archiver'], equals('NSKeyedArchiver'));
 
-      var topDict = dict[r'$top'] as Map<String, Object>;
+      final topDict = dict[r'$top'] as Map<String, Object>;
       expect(topDict['root'], equals(UID(1)));
 
-      var objectsList = dict[r'$objects'] as List<Object>;
+      final objectsList = dict[r'$objects'] as List<Object>;
       expect(objectsList[0], equals(r'$null'));
-      var dict1 = objectsList[1] as Map<String, Object>;
-      var NSObjectsList = dict1['NS.objects'] as List;
-      expect(NSObjectsList[0], equals(UID(2)));
-      expect(NSObjectsList[1], equals(UID(3)));
+      final dict1 = objectsList[1] as Map<String, Object>;
+      final nsObjectsList = dict1['NS.objects'] as List;
+      expect(nsObjectsList[0], equals(UID(2)));
+      expect(nsObjectsList[1], equals(UID(3)));
       expect(dict1[r'$class'], equals(UID(4)));
       expect(objectsList[2], equals(15.0));
       expect(objectsList[3], equals(16.0));
-      var dict4 = objectsList[4] as Map<String, Object>;
+      final dict4 = objectsList[4] as Map<String, Object>;
       expect(dict4[r'$classname'], equals('NSArray'));
-      var classesList = dict4[r'$classes'] as List;
+      final classesList = dict4[r'$classes'] as List;
       expect(classesList[0], equals('NSArray'));
       expect(classesList[1], equals('NSObject'));
     });
@@ -195,171 +248,290 @@ void main() {
   group('string', () {
     test('asciiString', () {
       expectString(
-          '', '62706c6973743030500800000000000001010000000000000001000000000000'
-          '00000000000000000009');
+          '',
+          '62706c6973743030500800000000000001010000000000000001000000000000'
+              '00000000000000000009');
       expectString(
-          ' ', '62706c697374303051200800000000000001010000000000000001000000000'
-          '0000000000000000000000a');
+          ' ',
+          '62706c697374303051200800000000000001010000000000000001000000000'
+              '0000000000000000000000a');
       expectString(
-          'The dog jumped over the moon', '62706c69737430305f101c54686520646f67'
-          '206a756d706564206f76657220746865206d6f6f6e08000000000000010100000000'
-          '0000000100000000000000000000000000000027');
+          'The dog jumped over the moon',
+          '62706c69737430305f101c54686520646f67'
+              '206a756d706564206f76657220746865206d6f6f6e08000000000000010100000000'
+              '0000000100000000000000000000000000000027');
     });
 
     test('unicodeString', () {
       expectString(
-          'Ā', '62706c697374303061010008000000000000010100000000000000010000000'
-          '000000000000000000000000b');
+          'Ā',
+          '62706c697374303061010008000000000000010100000000000000010000000'
+              '000000000000000000000000b');
       expectString(
-          'Āā', '62706c69737430306201000101080000000000000101000000000000000100'
-          '00000000000000000000000000000d');
+          'Āā',
+          '62706c69737430306201000101080000000000000101000000000000000100'
+              '00000000000000000000000000000d');
       expectString(
-          'ĀāThe cow jumped over the dogĂă', '62706c69737430306f101f01000101005'
-          '40068006500200063006f00770020006a0075006d0070006500640020006f0076006'
-          '50072002000740068006500200064006f00670102010308000000000000010100000'
-          '0000000000100000000000000000000000000000049');
+          'ĀāThe cow jumped over the dogĂă',
+          '62706c69737430306f101f01000101005'
+              '40068006500200063006f00770020006a0075006d0070006500640020006f0076006'
+              '50072002000740068006500200064006f00670102010308000000000000010100000'
+              '0000000000100000000000000000000000000000049');
     });
   });
 
   test('integer', () {
     // positive
-    expectInteger(0, '62706c697374303010000800000000000001010000000000000001000'
+    expectInteger(
+        0,
+        '62706c697374303010000800000000000001010000000000000001000'
         '0000000000000000000000000000a');
-    expectInteger(1, '62706c697374303010010800000000000001010000000000000001000'
+    expectInteger(
+        1,
+        '62706c697374303010010800000000000001010000000000000001000'
         '0000000000000000000000000000a');
-    expectInteger(126, '62706c6973743030107e08000000000000010100000000000000010'
+    expectInteger(
+        126,
+        '62706c6973743030107e08000000000000010100000000000000010'
         '000000000000000000000000000000a');
-    expectInteger(127, '62706c6973743030107f08000000000000010100000000000000010'
+    expectInteger(
+        127,
+        '62706c6973743030107f08000000000000010100000000000000010'
         '000000000000000000000000000000a');
-    expectInteger(128, '62706c6973743030108008000000000000010100000000000000010'
+    expectInteger(
+        128,
+        '62706c6973743030108008000000000000010100000000000000010'
         '000000000000000000000000000000a');
-    expectInteger(254, '62706c697374303010fe08000000000000010100000000000000010'
+    expectInteger(
+        254,
+        '62706c697374303010fe08000000000000010100000000000000010'
         '000000000000000000000000000000a');
-    expectInteger(255, '62706c697374303010ff08000000000000010100000000000000010'
+    expectInteger(
+        255,
+        '62706c697374303010ff08000000000000010100000000000000010'
         '000000000000000000000000000000a');
-    expectInteger(256, '62706c6973743030110100080000000000000101000000000000000'
+    expectInteger(
+        256,
+        '62706c6973743030110100080000000000000101000000000000000'
         '10000000000000000000000000000000b');
-    expectInteger(32766, '62706c6973743030117ffe0800000000000001010000000000000'
+    expectInteger(
+        32766,
+        '62706c6973743030117ffe0800000000000001010000000000000'
         '0010000000000000000000000000000000b');
-    expectInteger(32767, '62706c6973743030117fff0800000000000001010000000000000'
+    expectInteger(
+        32767,
+        '62706c6973743030117fff0800000000000001010000000000000'
         '0010000000000000000000000000000000b');
-    expectInteger(32768, '62706c69737430301180000800000000000001010000000000000'
+    expectInteger(
+        32768,
+        '62706c69737430301180000800000000000001010000000000000'
         '0010000000000000000000000000000000b');
-    expectInteger(65534, '62706c697374303011fffe0800000000000001010000000000000'
+    expectInteger(
+        65534,
+        '62706c697374303011fffe0800000000000001010000000000000'
         '0010000000000000000000000000000000b');
-    expectInteger(65535, '62706c697374303011ffff0800000000000001010000000000000'
+    expectInteger(
+        65535,
+        '62706c697374303011ffff0800000000000001010000000000000'
         '0010000000000000000000000000000000b');
-    expectInteger(65536, '62706c69737430301200010000080000000000000101000000000'
+    expectInteger(
+        65536,
+        '62706c69737430301200010000080000000000000101000000000'
         '00000010000000000000000000000000000000d');
-    expectInteger(2147483646, '62706c6973743030127ffffffe0800000000000001010000'
+    expectInteger(
+        2147483646,
+        '62706c6973743030127ffffffe0800000000000001010000'
         '0000000000010000000000000000000000000000000d');
-    expectInteger(2147483647, '62706c6973743030127fffffff0800000000000001010000'
+    expectInteger(
+        2147483647,
+        '62706c6973743030127fffffff0800000000000001010000'
         '0000000000010000000000000000000000000000000d');
-    expectInteger(2147483648, '62706c697374303012800000000800000000000001010000'
+    expectInteger(
+        2147483648,
+        '62706c697374303012800000000800000000000001010000'
         '0000000000010000000000000000000000000000000d');
-    expectInteger(9223372036854775806, '62706c6973743030137ffffffffffffffe08000'
+    expectInteger(
+        9223372036854775806,
+        '62706c6973743030137ffffffffffffffe08000'
         '0000000000101000000000000000100000000000000000000000000000011');
-    expectInteger(9223372036854775807, '62706c6973743030137fffffffffffffff08000'
+    expectInteger(
+        9223372036854775807,
+        '62706c6973743030137fffffffffffffff08000'
         '0000000000101000000000000000100000000000000000000000000000011');
 
     // negative
-    expectInteger(-1, '62706c697374303013ffffffffffffffff0800000000000001010000'
+    expectInteger(
+        -1,
+        '62706c697374303013ffffffffffffffff0800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    expectInteger(-127, '62706c697374303013ffffffffffffff8108000000000000010100'
+    expectInteger(
+        -127,
+        '62706c697374303013ffffffffffffff8108000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    expectInteger(-128, '62706c697374303013ffffffffffffff8008000000000000010100'
+    expectInteger(
+        -128,
+        '62706c697374303013ffffffffffffff8008000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    expectInteger(-129, '62706c697374303013ffffffffffffff7f08000000000000010100'
+    expectInteger(
+        -129,
+        '62706c697374303013ffffffffffffff7f08000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    expectInteger(-255, '62706c697374303013ffffffffffffff0108000000000000010100'
+    expectInteger(
+        -255,
+        '62706c697374303013ffffffffffffff0108000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    expectInteger(-256, '62706c697374303013ffffffffffffff0008000000000000010100'
+    expectInteger(
+        -256,
+        '62706c697374303013ffffffffffffff0008000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    expectInteger(-257, '62706c697374303013fffffffffffffeff08000000000000010100'
+    expectInteger(
+        -257,
+        '62706c697374303013fffffffffffffeff08000000000000010100'
         '0000000000000100000000000000000000000000000011');
-    expectInteger(-32767, '62706c697374303013ffffffffffff8001080000000000000101'
+    expectInteger(
+        -32767,
+        '62706c697374303013ffffffffffff8001080000000000000101'
         '000000000000000100000000000000000000000000000011');
-    expectInteger(-32768, '62706c697374303013ffffffffffff8000080000000000000101'
+    expectInteger(
+        -32768,
+        '62706c697374303013ffffffffffff8000080000000000000101'
         '000000000000000100000000000000000000000000000011');
-    expectInteger(-32769, '62706c697374303013ffffffffffff7fff080000000000000101'
+    expectInteger(
+        -32769,
+        '62706c697374303013ffffffffffff7fff080000000000000101'
         '000000000000000100000000000000000000000000000011');
-    expectInteger(-65534, '62706c697374303013ffffffffffff0002080000000000000101'
+    expectInteger(
+        -65534,
+        '62706c697374303013ffffffffffff0002080000000000000101'
         '000000000000000100000000000000000000000000000011');
-    expectInteger(-65535, '62706c697374303013ffffffffffff0001080000000000000101'
+    expectInteger(
+        -65535,
+        '62706c697374303013ffffffffffff0001080000000000000101'
         '000000000000000100000000000000000000000000000011');
-    expectInteger(-65536, '62706c697374303013ffffffffffff0000080000000000000101'
+    expectInteger(
+        -65536,
+        '62706c697374303013ffffffffffff0000080000000000000101'
         '000000000000000100000000000000000000000000000011');
-    expectInteger(-2147483647, '62706c697374303013ffffffff800000010800000000000'
+    expectInteger(
+        -2147483647,
+        '62706c697374303013ffffffff800000010800000000000'
         '00101000000000000000100000000000000000000000000000011');
-    expectInteger(-2147483648, '62706c697374303013ffffffff800000000800000000000'
+    expectInteger(
+        -2147483648,
+        '62706c697374303013ffffffff800000000800000000000'
         '00101000000000000000100000000000000000000000000000011');
-    expectInteger(-2147483649, '62706c697374303013ffffffff7fffffff0800000000000'
+    expectInteger(
+        -2147483649,
+        '62706c697374303013ffffffff7fffffff0800000000000'
         '00101000000000000000100000000000000000000000000000011');
-    expectInteger(-9223372036854775807, '62706c69737430301380000000000000010800'
+    expectInteger(
+        -9223372036854775807,
+        '62706c69737430301380000000000000010800'
         '00000000000101000000000000000100000000000000000000000000000011');
-    expectInteger(-9223372036854775808, '62706c69737430301380000000000000000800'
+    expectInteger(
+        -9223372036854775808,
+        '62706c69737430301380000000000000000800'
         '00000000000101000000000000000100000000000000000000000000000011');
   });
 
   test('float', () {
-    expectDouble(0.0, '62706c69737430302200000000080000000000000101000000000000'
+    expectDouble(
+        0.0,
+        '62706c69737430302200000000080000000000000101000000000000'
         '00010000000000000000000000000000000d');
-    expectDouble(1.0, '62706c6973743030223f800000080000000000000101000000000000'
+    expectDouble(
+        1.0,
+        '62706c6973743030223f800000080000000000000101000000000000'
         '00010000000000000000000000000000000d');
-    expectDouble(2.5, '62706c69737430302240200000080000000000000101000000000000'
+    expectDouble(
+        2.5,
+        '62706c69737430302240200000080000000000000101000000000000'
         '00010000000000000000000000000000000d');
     // Input was 987654321.12345, but due to lack of precision, output will
     // be 987654336.0
-    expectDouble(987654336.0, '62706c6973743030224e6b79a3080000000000000101'
+    expectDouble(
+        987654336.0,
+        '62706c6973743030224e6b79a3080000000000000101'
         '00000000000000010000000000000000000000000000000d');
-    expectDouble(-1.0, '62706c697374303022bf80000008000000000000010100000000000'
+    expectDouble(
+        -1.0,
+        '62706c697374303022bf80000008000000000000010100000000000'
         '000010000000000000000000000000000000d');
-    expectDouble(-2.5, '62706c697374303022c020000008000000000000010100000000000'
+    expectDouble(
+        -2.5,
+        '62706c697374303022c020000008000000000000010100000000000'
         '000010000000000000000000000000000000d');
     // Input was -987654321.12345, but due to lack of precision, output will
     // be 987654336.0
-    expectDouble(-987654336.0, '62706c697374303022ce6b79a308000000000000010'
+    expectDouble(
+        -987654336.0,
+        '62706c697374303022ce6b79a308000000000000010'
         '100000000000000010000000000000000000000000000000d');
 
-    expectDouble(0.0, '62706c69737430302300000000000000000800000000000001010000'
+    expectDouble(
+        0.0,
+        '62706c69737430302300000000000000000800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    expectDouble(1.0, '62706c6973743030233ff00000000000000800000000000001010000'
+    expectDouble(
+        1.0,
+        '62706c6973743030233ff00000000000000800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    expectDouble(2.5, '62706c69737430302340040000000000000800000000000001010000'
+    expectDouble(
+        2.5,
+        '62706c69737430302340040000000000000800000000000001010000'
         '00000000000100000000000000000000000000000011');
-    expectDouble(987654321.12345, '62706c69737430302341cd6f34588fcd360800000000'
+    expectDouble(
+        987654321.12345,
+        '62706c69737430302341cd6f34588fcd360800000000'
         '00000101000000000000000100000000000000000000000000000011');
-    expectDouble(-1.0, '62706c697374303023bff0000000000000080000000000000101000'
+    expectDouble(
+        -1.0,
+        '62706c697374303023bff0000000000000080000000000000101000'
         '000000000000100000000000000000000000000000011');
-    expectDouble(-2.5, '62706c697374303023c004000000000000080000000000000101000'
+    expectDouble(
+        -2.5,
+        '62706c697374303023c004000000000000080000000000000101000'
         '000000000000100000000000000000000000000000011');
-    expectDouble(-987654321.12345, '62706c697374303023c1cd6f34588fcd36080000000'
+    expectDouble(
+        -987654321.12345,
+        '62706c697374303023c1cd6f34588fcd36080000000'
         '000000101000000000000000100000000000000000000000000000011');
   });
 
   group('boolean', () {
     test('true', () {
-      expectBoolean(true, '62706c6973743030090800000000000001010000000000000001'
-          '00000000000000000000000000000009');
+      expectBoolean(
+        '62706c6973743030090800000000000001010000000000000001'
+        '00000000000000000000000000000009',
+        matcher: true,
+      );
     });
 
     test('false', () {
       expectBoolean(
-          false, '62706c6973743030080800000000000001010000000000000001000000000'
-          '00000000000000000000009');
+        '62706c6973743030080800000000000001010000000000000001000000000'
+        '00000000000000000000009',
+        matcher: false,
+      );
     });
   });
 
   // Date
 
   test('date', () {
-    expectDate(DateTime.utc(1970, DateTime.january, 1, 12, 0, 0), '62706c697374'
+    expectDate(
+        DateTime.utc(1970, DateTime.january, 1, 12),
+        '62706c697374'
         '303033c1cd278fe0000000080000000000000101000000000000000100000000000000'
         '000000000000000011');
-    expectDate(DateTime.utc(1890, DateTime.june, 25, 06, 45, 13), '62706c697374'
+    expectDate(
+        DateTime.utc(1890, DateTime.june, 25, 6, 45, 13),
+        '62706c697374'
         '303033c1e9fc3af0e00000080000000000000101000000000000000100000000000000'
         '000000000000000011');
-    expectDate(DateTime.utc(2019, DateTime.november, 4, 14, 22, 59), '62706c697'
+    expectDate(
+        DateTime.utc(2019, DateTime.november, 4, 14, 22, 59),
+        '62706c697'
         '37430303341c1b835e1800000080000000000000101000000000000000100000000000'
         '000000000000000000011');
   });
@@ -367,24 +539,40 @@ void main() {
   // Data
 
   test('data', () {
-    expectData(0, '62706c697374303040080000000000000101000000000000000100000000'
+    expectData(
+        0,
+        '62706c697374303040080000000000000101000000000000000100000000'
         '000000000000000000000009');
-    expectData(1, '62706c697374303041000800000000000001010000000000000001000000'
+    expectData(
+        1,
+        '62706c697374303041000800000000000001010000000000000001000000'
         '0000000000000000000000000a');
-    expectData(2, '62706c697374303042000108000000000000010100000000000000010000'
+    expectData(
+        2,
+        '62706c697374303042000108000000000000010100000000000000010000'
         '000000000000000000000000000b');
-    expectData(14, '62706c69737430304e000102030405060708090a0b0c0d0800000000000'
+    expectData(
+        14,
+        '62706c69737430304e000102030405060708090a0b0c0d0800000000000'
         '00101000000000000000100000000000000000000000000000017');
-    expectData(15, '62706c69737430304f100f000102030405060708090a0b0c0d0e0800000'
+    expectData(
+        15,
+        '62706c69737430304f100f000102030405060708090a0b0c0d0e0800000'
         '0000000010100000000000000010000000000000000000000000000001a');
-    expectData(16, '62706c69737430304f1010000102030405060708090a0b0c0d0e0f08000'
+    expectData(
+        16,
+        '62706c69737430304f1010000102030405060708090a0b0c0d0e0f08000'
         '000000000010100000000000000010000000000000000000000000000001b');
-    expectData(100, '62706c69737430304f1064000102030405060708090a0b0c0d0e0f1011'
+    expectData(
+        100,
+        '62706c69737430304f1064000102030405060708090a0b0c0d0e0f1011'
         '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334'
         '35363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f5051525354555657'
         '58595a5b5c5d5e5f606162630800000000000001010000000000000001000000000000'
         '0000000000000000006f');
-    expectData(1000, '62706c69737430304f1103e8000102030405060708090a0b0c0d0e0f1'
+    expectData(
+        1000,
+        '62706c69737430304f1103e8000102030405060708090a0b0c0d0e0f1'
         '01112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323'
         '33435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f5051525354555'
         '65758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f7071727374757677787'
@@ -421,9 +609,9 @@ void main() {
 /// Converts a hex encoded string [template] and returns it as ByteData.
 
 ByteData bytes(String template) {
-  var list = hex.decoder.convert(template);
-  var ulist = Uint8List.fromList(list);
-  var buffer = ulist.buffer;
+  final list = hex.decoder.convert(template);
+  final ulist = Uint8List.fromList(list);
+  final buffer = ulist.buffer;
   return ByteData.view(buffer);
 }
 
@@ -431,7 +619,7 @@ ByteData bytes(String template) {
 /// The values wrap at 255 back to 0.
 
 ByteData makeData(int len) {
-  var gen = ByteData(len);
+  final gen = ByteData(len);
   var v = 0;
   for (var i = 0; i < len; i++) {
     gen.setUint8(i, v);
@@ -456,10 +644,10 @@ void expectByteData(ByteData actual, ByteData matcher) {
 /// object as String [matcher].
 
 void expectString(String matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template), false);
-  var o = p.parse();
+  final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+  final o = p.parse();
   expect(true, o.runtimeType == String);
-  var s = o as String;
+  final s = o as String;
   expect(s, equals(matcher));
 }
 
@@ -467,10 +655,10 @@ void expectString(String matcher, String template) {
 /// object as an int [matcher].
 
 void expectInteger(int matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template), false);
-  var o = p.parse();
+  final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+  final o = p.parse();
   expect(true, o.runtimeType == int);
-  var i = o as int;
+  final i = o as int;
   expect(i, equals(matcher));
 }
 
@@ -478,21 +666,21 @@ void expectInteger(int matcher, String template) {
 /// object as a double [matcher].
 
 void expectDouble(double matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template), false);
-  var o = p.parse();
+  final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+  final o = p.parse();
   expect(true, o.runtimeType == double);
-  var d = o as double;
+  final d = o as double;
   expect(d, equals(matcher));
 }
 
 /// Decodes the plist hex encoded string [template] and compares the resulting
 /// object as a boolean [matcher].
 
-void expectBoolean(bool matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template), false);
-  var o = p.parse();
+void expectBoolean(String template, {required bool matcher}) {
+  final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+  final o = p.parse();
   expect(true, o.runtimeType == bool);
-  var d = o as bool;
+  final d = o as bool;
   expect(d, matcher);
 }
 
@@ -500,10 +688,10 @@ void expectBoolean(bool matcher, String template) {
 /// object as a DateTime [matcher].
 
 void expectDate(DateTime matcher, String template) {
-  var p = BinaryPropertyListReader(bytes(template), false);
-  var o = p.parse();
+  final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+  final o = p.parse();
   expect(true, o.runtimeType == DateTime);
-  var d = o as DateTime;
+  final d = o as DateTime;
   expect(d, matcher);
 }
 
@@ -511,9 +699,9 @@ void expectDate(DateTime matcher, String template) {
 /// object as a ByteData [matcher].
 
 void expectData(int length, String template) {
-  var p = BinaryPropertyListReader(bytes(template), false);
-  var o = p.parse();
-  var d = o as ByteData;
-  var b = makeData(length);
+  final p = BinaryPropertyListReader(bytes(template), keyedArchive: false);
+  final o = p.parse();
+  final d = o as ByteData;
+  final b = makeData(length);
   expectByteData(d, b);
 }

@@ -3,19 +3,22 @@
 
 import 'dart:typed_data';
 
+import 'package:propertylistserialization/src/binarypropertylistreader.dart';
+import 'package:propertylistserialization/src/binarypropertylistwriter.dart';
 import 'package:propertylistserialization/src/xmlpropertylistreader.dart';
 import 'package:propertylistserialization/src/xmlpropertylistwriter.dart';
-
-import 'src/binarypropertylistreader.dart';
-import 'src/binarypropertylistwriter.dart';
 
 abstract class PropertyListException implements Exception {
   final Object? _nested;
   final String? _message;
 
-  PropertyListException(String message) : _nested = null, _message = message;
-  PropertyListException.nested(Object nested) : _nested = nested, _message =
-    null;
+  PropertyListException(String message)
+      : _nested = null,
+        _message = message;
+
+  PropertyListException.nested(Object nested)
+      : _nested = nested,
+        _message = null;
 
   @override
   String toString() {
@@ -31,29 +34,28 @@ abstract class PropertyListException implements Exception {
 /// encountered while reading the property list.
 
 class PropertyListReadStreamException extends PropertyListException {
+  PropertyListReadStreamException(super.message);
 
-  PropertyListReadStreamException(String message) : super(message);
-  PropertyListReadStreamException.nested(Object nested) : super.nested(nested);
+  PropertyListReadStreamException.nested(super.nested) : super.nested();
 
   @override
   String toString() {
-    return 'PropertyListReadStreamException: ' + super.toString();
+    return 'PropertyListReadStreamException: ${super.toString()}';
   }
-
 }
 
 /// Analogous to NSPropertyListWriteStreamError - an stream error was
 /// encountered while writing the property list.
 
 class PropertyListWriteStreamException extends PropertyListException {
-  PropertyListWriteStreamException(String message) : super(message);
-  PropertyListWriteStreamException.nested(Object nested) : super.nested(nested);
+  PropertyListWriteStreamException(super.message);
+
+  PropertyListWriteStreamException.nested(super.nested) : super.nested();
 
   @override
   String toString() {
-    return 'PropertyListWriteStreamException: ' + super.toString();
+    return 'PropertyListWriteStreamException: ${super.toString()}';
   }
-
 }
 
 /// Wrapper to force writing a double value as a 32-bit floating point number.
@@ -65,7 +67,7 @@ class Float32 {
 
   @override
   bool operator ==(Object other) {
-    if (!(other is Float32)) {
+    if (other is! Float32) {
       return false;
     }
     return value == other.value;
@@ -78,7 +80,6 @@ class Float32 {
   String toString() {
     return value.toString();
   }
-
 }
 
 /// A CoreFoundation CF$UID value used in a NSKeyedArchiver binary plist.
@@ -90,7 +91,7 @@ class UID {
 
   @override
   bool operator ==(Object other) {
-    if (!(other is UID)) {
+    if (other is! UID) {
       return false;
     }
     return value == other.value;
@@ -103,11 +104,9 @@ class UID {
   String toString() {
     return value.toString();
   }
-
 }
 
 class PropertyListSerialization {
-
   /// For the object graph provided, returns a property list as binary ByteData.
   /// Equivalent to iOS method
   /// `[NSPropertyList dataWithPropertyList:format:options:error]`
@@ -123,9 +122,9 @@ class PropertyListSerialization {
 
   static ByteData dataWithPropertyList(Object obj) {
     try {
-      var p = BinaryPropertyListWriter(obj);
+      final p = BinaryPropertyListWriter(obj);
       return p.write();
-    } catch(e, s) {
+    } catch (e, s) {
       print(s);
       throw PropertyListWriteStreamException.nested(e);
     }
@@ -146,9 +145,9 @@ class PropertyListSerialization {
 
   static String stringWithPropertyList(Object obj) {
     try {
-      var p = XMLPropertyListWriter(obj);
+      final p = XMLPropertyListWriter(obj);
       return p.write();
-    } catch(e, s) {
+    } catch (e, s) {
       print(s);
       throw PropertyListWriteStreamException.nested(e);
     }
@@ -167,14 +166,22 @@ class PropertyListSerialization {
   /// Returns one of String, int, double, Map<String, Object>,
   /// List, DateTime, bool, ByteData or UID.
   ///
+  /// Hint: To convert any returned ByteData objects into a Uint8List, you
+  /// should use the following pattern:
+  ///
+  /// data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  ///
   /// Throws [PropertyListReadStreamException] if the plist is corrupt, values
   /// could not be converted or the input stream is EOF.
 
-  static Object propertyListWithData(ByteData data, {bool keyedArchive = false}) {
+  static Object propertyListWithData(
+    ByteData data, {
+    bool keyedArchive = false,
+  }) {
     try {
-      var p = BinaryPropertyListReader(data, keyedArchive);
+      final p = BinaryPropertyListReader(data, keyedArchive: keyedArchive);
       return p.parse();
-    } catch(e, s) {
+    } catch (e, s) {
       if (e is PropertyListReadStreamException) {
         rethrow;
       } else {
@@ -193,17 +200,21 @@ class PropertyListSerialization {
   /// Returns one of String, int, double, Map<String, Object>,
   /// List, DateTime, bool or ByteData.
   ///
+  /// Hint: To convert any returned ByteData objects into a Uint8List, you
+  /// should use the following pattern:
+  ///
+  /// data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  ///
   /// Throws [PropertyListReadStreamException] if the plist is corrupt, values
   /// could not be converted or the input stream is EOF.
 
   static Object propertyListWithString(String string) {
     try {
-      var p = XMLPropertyListReader(string);
+      final p = XMLPropertyListReader(string);
       return p.parse();
-    } catch(e, s) {
+    } catch (e, s) {
       print(s);
       throw PropertyListReadStreamException.nested(e);
     }
   }
-
 }

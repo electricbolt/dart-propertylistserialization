@@ -28,12 +28,12 @@ class XMLPropertyListReader {
     _requireDoctype();
     _requireStartElement('plist');
     _logStart('<plist>');
-    var event = _nextEventSkipOptionalText();
-    if (!(event is XmlStartElementEvent)) {
+    final event = _nextEventSkipOptionalText();
+    if (event is! XmlStartElementEvent) {
       throw _expected(event, 'XmlStartElementEvent (array,dict,string,data,'
           'date,integer,real,true,false)');
     }
-    var result = _readObject(event);
+    final result = _readObject(event);
     _requireEndElement('plist', skipOptionalText: true);
     _logEnd('</plist>');
     return result;
@@ -84,15 +84,15 @@ class XMLPropertyListReader {
   /// </array>               <-- to the end of the array.
 
   List _readArray(bool isSelfClosing) {
-    var list = <Object>[];
+    final list = <Object>[];
     if (isSelfClosing) {
       _log('</array>');
       return list;
     }
     _logStart('<array>');
     var event = _nextEventSkipOptionalText();
-    while (!(event is XmlEndElementEvent)) {
-      if (!(event is XmlStartElementEvent)) {
+    while (event is! XmlEndElementEvent) {
+      if (event is! XmlStartElementEvent) {
         throw _expected(event, 'XmlStartElementEvent (array,dict,string,data,'
             'date,integer,real,true,false)');
       }
@@ -113,29 +113,28 @@ class XMLPropertyListReader {
   /// </dict>               <-- to the end of the dict.
 
   Map _readDict(bool isSelfClosing) {
-    var dict = <String, Object>{};
+    final dict = <String, Object>{};
     if (isSelfClosing) {
       _log('<dict/>');
       return dict;
     }
     _logStart('<dict>');
     var event = _nextEventSkipOptionalText();
-    while (!(event is XmlEndElementEvent)) {
+    while (event is! XmlEndElementEvent) {
       // Read key
-      if (!(event is XmlStartElementEvent) || (event is XmlStartElementEvent &&
-          event.name != 'key')) {
+      if (event is! XmlStartElementEvent || (event.name != 'key')) {
         throw _expected(event, 'XmlStartElementEvent (key)');
       }
       event = _nextEvent();
-      if (!(event is XmlTextEvent)) {
+      if (event is! XmlTextEvent) {
         throw _expected(event, 'XmlTextEvent');
       }
-      var key = event.text; // key: always a string
+      final key = event.text; // key: always a string
       _requireEndElement('key');
       _log('<key>$key</key>');
       // Read value
       event = _nextEvent();
-      if (!(event is XmlStartElementEvent)) {
+      if (event is! XmlStartElementEvent) {
         throw _expected(event, 'XmlStartElementEvent (array,dict,string,data,'
             'date,integer,real,true,false)');
       }
@@ -153,7 +152,7 @@ class XMLPropertyListReader {
       return ByteData(0);
     }
 
-    var sb = StringBuffer();
+    final sb = StringBuffer();
 
     var event = _nextEvent();
     if ((event is XmlEndElementEvent) && event.name == 'data') {
@@ -162,8 +161,8 @@ class XMLPropertyListReader {
       return ByteData(0);
     }
 
-    while (!(event is XmlEndElementEvent)) {
-      if (!(event is XmlTextEvent)) {
+    while (event is! XmlEndElementEvent) {
+      if (event is! XmlTextEvent) {
         throw _expected(event, 'XmlTextEvent');
       }
 
@@ -173,10 +172,10 @@ class XMLPropertyListReader {
       event = _nextEvent();
     }
 
-    var result = sb.toString();
+    final result = sb.toString();
     _log('<data>$result</data>');
 
-    return Base64Decoder().convert(result).buffer.asByteData();
+    return const Base64Decoder().convert(result).buffer.asByteData();
   }
 
   /// Ensures the next element from the xml stream is `text`. Then ensures an
@@ -190,16 +189,16 @@ class XMLPropertyListReader {
       _skipOptionalText();
       return '';
     } else {
-      var event = _nextEvent();
+      final event = _nextEvent();
       if ((event is XmlEndElementEvent) && event.name == tagName) {
         // Handle empty string. e.g. <string></string>
         _log('<$tagName></$tagName>');
         return '';
       }
-      if (!(event is XmlTextEvent)) {
+      if (event is! XmlTextEvent) {
         throw _expected(event, 'XmlTextEvent');
       }
-      var result = event.text.trim();
+      final result = event.text.trim();
       _requireEndElement(tagName);
       _log('<$tagName>$result</$tagName>');
       return result;
@@ -210,7 +209,7 @@ class XMLPropertyListReader {
   /// 'Expected $tagName, found $nodeType `$event`'.
 
   PropertyListReadStreamException _expected(XmlEvent event, String tagName) {
-    var nodeType = event.nodeType;
+    final nodeType = event.nodeType;
     return PropertyListReadStreamException('Expected $tagName, found $nodeType '
         '`$event`');
   }
@@ -220,8 +219,8 @@ class XMLPropertyListReader {
   /// e.g. `<string>` where `string` is the [tagName] value.
 
   void _requireStartElement(String tagName) {
-    var event = _nextEventSkipOptionalText();
-    if (!(event is XmlStartElementEvent) || event.name != tagName) {
+    final event = _nextEventSkipOptionalText();
+    if (event is! XmlStartElementEvent || event.name != tagName) {
       throw _expected(event, tagName);
     }
     _skipOptionalText();
@@ -232,8 +231,8 @@ class XMLPropertyListReader {
   /// e.g. </string> where `string` is the [tagName] value.
 
   void _requireEndElement(String tagName, {bool skipOptionalText = false}) {
-    var event = _nextEventSkipOptionalText();
-    if (!(event is XmlEndElementEvent) || event.name != tagName) {
+    final event = _nextEventSkipOptionalText();
+    if (event is! XmlEndElementEvent || event.name != tagName) {
       throw _expected(event, tagName);
     }
     if (!skipOptionalText) {
@@ -245,8 +244,8 @@ class XMLPropertyListReader {
   /// throws a [PropertyListReadStreamException].
 
   void _requireDoctype() {
-    var event = _nextEvent();
-    if (!(event is XmlDoctypeEvent)) {
+    final event = _nextEvent();
+    if (event is! XmlDoctypeEvent) {
       throw _expected(event, '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//'
           'EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">');
     }
@@ -257,8 +256,8 @@ class XMLPropertyListReader {
   /// otherwise throws a [PropertyListReadStreamException].
 
   void _requireXmlDeclaration() {
-    var event = _nextEvent();
-    if (!(event is XmlDeclarationEvent)) {
+    final event = _nextEvent();
+    if (event is! XmlDeclarationEvent) {
       throw _expected(event, '<?xml version="1.0" encoding="UTF-8"?>');
     }
     _skipOptionalText();
@@ -269,8 +268,8 @@ class XMLPropertyListReader {
   /// encountered.
 
   void _skipOptionalText() {
-    var event = _nextEvent();
-    if (!(event is XmlTextEvent)) {
+    final event = _nextEvent();
+    if (event is! XmlTextEvent) {
       _pushEvent(event);
     }
   }
@@ -294,7 +293,7 @@ class XMLPropertyListReader {
 
   XmlEvent _nextEvent() {
     if (_pushbackEvent != null) {
-      var e = _pushbackEvent!;
+      final e = _pushbackEvent!;
       _pushbackEvent = null;
       return e;
     }
@@ -302,7 +301,7 @@ class XMLPropertyListReader {
       if (_events.moveNext() == false) {
         throw PropertyListReadStreamException('Unexpected end of plist');
       }
-      var event = _events.current;
+      final event = _events.current;
       if (event is XmlCommentEvent) {
         continue;
       }

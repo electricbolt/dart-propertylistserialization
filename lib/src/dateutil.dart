@@ -5,19 +5,19 @@
 /// milliseconds from epoch. Returns a [DateTime].
 
 DateTime parseBinary(double d) {
-  var binaryPlistEpoch = DateTime.utc(2001, DateTime.january, 1);
+  final binaryPlistEpoch = DateTime.utc(2001, DateTime.january, 1);
   return binaryPlistEpoch.add(Duration(seconds: d.toInt()));
 }
 
 double formatBinary(DateTime d) {
-  var binaryPlistEpoch = DateTime.utc(2001, DateTime.january, 1);
+  final binaryPlistEpoch = DateTime.utc(2001, DateTime.january, 1);
   return (d.millisecondsSinceEpoch - binaryPlistEpoch.millisecondsSinceEpoch) /
       1000.0;
 }
 
 String _formatSixDigits(int n) {
-  var absN = n.abs();
-  var sign = n < 0 ? '-' : '+';
+  final absN = n.abs();
+  final sign = n < 0 ? '-' : '+';
   if (absN >= 100000) {
     return '$sign$absN';
   } else {
@@ -26,8 +26,8 @@ String _formatSixDigits(int n) {
 }
 
 String _formatFourDigits(int n) {
-  var absN = n.abs();
-  var sign = n < 0 ? '-' : '';
+  final absN = n.abs();
+  final sign = n < 0 ? '-' : '';
   if (absN >= 1000) {
     return '$n';
   } else if (absN >= 100) {
@@ -48,13 +48,13 @@ String _formatTwoDigits(int n) {
 }
 
 String formatXML(DateTime d) {
-  var year = (d.year >= -9999 && d.year <= 9999) ? _formatFourDigits(d.year) :
+  final year = (d.year >= -9999 && d.year <= 9999) ? _formatFourDigits(d.year) :
     _formatSixDigits(d.year);
-  var month = _formatTwoDigits(d.month);
-  var day = _formatTwoDigits(d.day);
-  var hour = _formatTwoDigits(d.hour);
-  var minute = _formatTwoDigits(d.minute);
-  var second = _formatTwoDigits(d.second);
+  final month = _formatTwoDigits(d.month);
+  final day = _formatTwoDigits(d.day);
+  final hour = _formatTwoDigits(d.hour);
+  final minute = _formatTwoDigits(d.minute);
+  final second = _formatTwoDigits(d.second);
   return '$year-$month-${day}T$hour:$minute:${second}Z';
 }
 

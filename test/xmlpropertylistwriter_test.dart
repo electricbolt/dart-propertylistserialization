@@ -19,81 +19,111 @@ void main() {
     expect(safeSubstring('ab', 1, 1), equals('b'));
     expect(safeSubstring('ab', 1, 2), equals('b'));
     expect(safeSubstring('ab', 1, 3), equals('b'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 13),
-        equals('abcdefghijklm'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 13),
-        equals('bcdefghijklmn'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 26),
-        equals('abcdefghijklmnopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 27),
-        equals('abcdefghijklmnopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 28),
-        equals('abcdefghijklmnopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 26),
-        equals('bcdefghijklmnopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 25),
-        equals('bcdefghijklmnopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 26),
-        equals('bcdefghijklmnopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 27),
-        equals('bcdefghijklmnopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 10),
-        equals('nopqrstuvw'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 12),
-        equals('nopqrstuvwxy'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 13),
-        equals('nopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 14),
-        equals('nopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 15),
-        equals('nopqrstuvwxyz'));
-    expect(safeSubstring('abcdefghijklmnopqrstuvwxyz', 14, 20),
-        equals('opqrstuvwxyz'));
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 13),
+      equals('abcdefghijklm'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 13),
+      equals('bcdefghijklmn'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 26),
+      equals('abcdefghijklmnopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 27),
+      equals('abcdefghijklmnopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 0, 28),
+      equals('abcdefghijklmnopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 26),
+      equals('bcdefghijklmnopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 25),
+      equals('bcdefghijklmnopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 26),
+      equals('bcdefghijklmnopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 1, 27),
+      equals('bcdefghijklmnopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 10),
+      equals('nopqrstuvw'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 12),
+      equals('nopqrstuvwxy'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 13),
+      equals('nopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 14),
+      equals('nopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 13, 15),
+      equals('nopqrstuvwxyz'),
+    );
+    expect(
+      safeSubstring('abcdefghijklmnopqrstuvwxyz', 14, 20),
+      equals('opqrstuvwxyz'),
+    );
   });
 
   group('string', () {
     test('string', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList'
           '-1.0.dtd">\n'
           '<plist version="1.0">\n'
           '<string>String1</string>\n'
           '</plist>\n';
-      var p = XMLPropertyListWriter('String1');
-      var result = p.write();
+      final p = XMLPropertyListWriter('String1');
+      final result = p.write();
       expect(result, equals(template));
     });
 
     test('emptyString', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList'
           '-1.0.dtd">\n'
           '<plist version="1.0">\n'
           '<string></string>\n'
           '</plist>\n';
-      var p = XMLPropertyListWriter('');
-      var result = p.write();
+      final p = XMLPropertyListWriter('');
+      final result = p.write();
       expect(result, equals(template));
     });
   });
 
   test('integer', () {
-    var template =
+    const template =
         '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//App'
         'le//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd'
         '">\n'
         '<plist version="1.0">\n'
         '<integer>42</integer>\n'
         '</plist>\n';
-    var p = XMLPropertyListWriter(42);
-    var result = p.write();
+    final p = XMLPropertyListWriter(42);
+    final result = p.write();
     expect(result, equals(template));
   });
 
   test('real', () {
-    var template =
+    const template =
         '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//App'
         'le//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd'
         '">\n'
@@ -110,49 +140,50 @@ void main() {
   });
 
   test('date', () {
-    var template =
+    const template =
         '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//App'
         'le//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd'
         '">\n'
         '<plist version="1.0">\n'
         '<date>2018-03-17T15:53:00Z</date>\n'
         '</plist>\n';
-    var p = XMLPropertyListWriter(DateTime.utc(2018, DateTime.march, 17, 15,
-        53, 0));
-    var result = p.write();
+    final p = XMLPropertyListWriter(
+      DateTime.utc(2018, DateTime.march, 17, 15, 53),
+    );
+    final result = p.write();
     expect(result, equals(template));
   });
 
   group('boolean', () {
     test('true', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList'
           '-1.0.dtd">\n'
           '<plist version="1.0">\n'
           '<true/>\n'
           '</plist>\n';
-      var p = XMLPropertyListWriter(true);
-      var result = p.write();
+      final p = XMLPropertyListWriter(true);
+      final result = p.write();
       expect(result, equals(template));
     });
 
     test('false', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList'
           '-1.0.dtd">\n'
           '<plist version="1.0">\n'
           '<false/>\n'
           '</plist>\n';
-      var p = XMLPropertyListWriter(false);
-      var result = p.write();
+      final p = XMLPropertyListWriter(false);
+      final result = p.write();
       expect(result, equals(template));
     });
   });
 
   test('array', () {
-    var template =
+    const template =
         '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//App'
         'le//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd'
         '">\n'
@@ -174,13 +205,13 @@ void main() {
         '</array>\n'
         '</plist>\n';
 
-    var graph1 = [];
-    var graph2 = [];
+    final graph1 = [];
+    final graph2 = [];
     graph2.add('String1');
     graph2.add('String2');
     graph2.add('');
     graph1.add(graph2);
-    var dict = <String, Object>{};
+    final dict = <String, Object>{};
     dict['Key'] = 'Value';
     graph1.add(dict);
     graph1.add(5);
@@ -188,13 +219,13 @@ void main() {
     graph1.add(true);
     graph1.add(false);
 
-    var p = XMLPropertyListWriter(graph1);
-    var result = p.write();
+    final p = XMLPropertyListWriter(graph1);
+    final result = p.write();
     expect(result, equals(template));
   });
 
   test('dict', () {
-    var template =
+    const template =
         '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//App'
         'le//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd'
         '">\n'
@@ -222,29 +253,28 @@ void main() {
         '</dict>\n'
         '</plist>\n';
 
-    var graph1 = <String, Object>{};
+    final graph1 = <String, Object>{};
     graph1['True'] = true;
-    var dict = <String, Object>{};
+    final dict = <String, Object>{};
     dict['Key'] = 'Value';
     graph1['Dict'] = dict;
     graph1['Integer'] = 5;
     graph1['Real'] = 42.5;
-    var graph2 = [];
+    final graph2 = [];
     graph2.add('String1');
     graph2.add('String2');
     graph2.add('');
     graph1['Array'] = graph2;
     graph1['False'] = false;
 
-    var p = XMLPropertyListWriter(graph1);
-    var result = p.write();
+    final p = XMLPropertyListWriter(graph1);
+    final result = p.write();
     expect(result, equals(template));
   });
 
-  group('data', ()
-  {
+  group('data', () {
     test('dataNoIndent', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0'
           '.dtd">\n'
@@ -254,13 +284,13 @@ void main() {
           '</data>\n'
           '</plist>\n';
 
-      var p = XMLPropertyListWriter(_string('String5'));
-      var result = p.write();
+      final p = XMLPropertyListWriter(_string('String5'));
+      final result = p.write();
       expect(result, equals(template));
     });
 
     test('dataOneIndent', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0'
           '.dtd">\n'
@@ -273,15 +303,15 @@ void main() {
           '</dict>\n'
           '</plist>\n';
 
-      var dict = <String, Object>{};
+      final dict = <String, Object>{};
       dict['Data'] = _string('String5');
-      var p = XMLPropertyListWriter(dict);
-      var result = p.write();
+      final p = XMLPropertyListWriter(dict);
+      final result = p.write();
       expect(result, equals(template));
     });
 
     test('dataTwoIndent', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0'
           '.dtd">\n'
@@ -297,17 +327,17 @@ void main() {
           '</dict>\n'
           '</plist>\n';
 
-      var dict1 = <String, Object>{};
-      var dict2 = <String, Object>{};
+      final dict1 = <String, Object>{};
+      final dict2 = <String, Object>{};
       dict1['Data'] = dict2;
       dict2['Data2'] = _string('String5');
-      var p = XMLPropertyListWriter(dict1);
-      var result = p.write();
+      final p = XMLPropertyListWriter(dict1);
+      final result = p.write();
       expect(result, equals(template));
     });
 
     test('dataEightIndent', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0'
           '.dtd">\n'
@@ -341,14 +371,14 @@ void main() {
           '</dict>\n'
           '</plist>\n';
 
-      var dict1 = <String, Object>{};
-      var dict2 = <String, Object>{};
-      var dict3 = <String, Object>{};
-      var dict4 = <String, Object>{};
-      var dict5 = <String, Object>{};
-      var dict6 = <String, Object>{};
-      var dict7 = <String, Object>{};
-      var dict8 = <String, Object>{};
+      final dict1 = <String, Object>{};
+      final dict2 = <String, Object>{};
+      final dict3 = <String, Object>{};
+      final dict4 = <String, Object>{};
+      final dict5 = <String, Object>{};
+      final dict6 = <String, Object>{};
+      final dict7 = <String, Object>{};
+      final dict8 = <String, Object>{};
 
       dict1['Data'] = dict2;
       dict2['Data2'] = dict3;
@@ -359,14 +389,13 @@ void main() {
       dict7['Data7'] = dict8;
       dict8['Data8'] = _string('String5');
 
-      var p = XMLPropertyListWriter(dict1);
-      var result = p.write();
+      final p = XMLPropertyListWriter(dict1);
+      final result = p.write();
       expect(result, equals(template));
     });
 
-    test('dataNineIndentLimitedToEightIndent', ()
-    {
-      var template =
+    test('dataNineIndentLimitedToEightIndent', () {
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0'
           '.dtd">\n'
@@ -403,15 +432,15 @@ void main() {
           '</dict>\n'
           '</plist>\n';
 
-      var dict1 = <String, Object>{};
-      var dict2 = <String, Object>{};
-      var dict3 = <String, Object>{};
-      var dict4 = <String, Object>{};
-      var dict5 = <String, Object>{};
-      var dict6 = <String, Object>{};
-      var dict7 = <String, Object>{};
-      var dict8 = <String, Object>{};
-      var dict9 = <String, Object>{};
+      final dict1 = <String, Object>{};
+      final dict2 = <String, Object>{};
+      final dict3 = <String, Object>{};
+      final dict4 = <String, Object>{};
+      final dict5 = <String, Object>{};
+      final dict6 = <String, Object>{};
+      final dict7 = <String, Object>{};
+      final dict8 = <String, Object>{};
+      final dict9 = <String, Object>{};
 
       dict1['Data'] = dict2;
       dict2['Data2'] = dict3;
@@ -423,13 +452,13 @@ void main() {
       dict8['Data8'] = dict9;
       dict9['Data9'] = _string('String5');
 
-      var p = XMLPropertyListWriter(dict1);
-      var result = p.write();
+      final p = XMLPropertyListWriter(dict1);
+      final result = p.write();
       expect(result, equals(template));
     });
 
     test('largeDataTwoIndentSpanning3Lines', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0'
           '.dtd">\n'
@@ -447,19 +476,19 @@ void main() {
           '</dict>\n'
           '</plist>\n';
 
-      var dict1 = <String, Object>{};
-      var dict2 = <String, Object>{};
+      final dict1 = <String, Object>{};
+      final dict2 = <String, Object>{};
       dict1['Data'] = dict2;
       dict2['Data2'] = _string('The quick brown fox jumps over the lazy dog. '
           'Elephants and sheep are visually quite different.');
 
-      var p = XMLPropertyListWriter(dict1);
-      var result = p.write();
+      final p = XMLPropertyListWriter(dict1);
+      final result = p.write();
       expect(result, equals(template));
     });
 
     test('largeDataNineIndentSpanning5Lines', () {
-      var template =
+      const template =
           '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//A'
           'pple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0'
           '.dtd">\n'
@@ -510,15 +539,15 @@ void main() {
           '</dict>\n'
           '</plist>\n';
 
-      var dict1 = <String, Object>{};
-      var dict2 = <String, Object>{};
-      var dict3 = <String, Object>{};
-      var dict4 = <String, Object>{};
-      var dict5 = <String, Object>{};
-      var dict6 = <String, Object>{};
-      var dict7 = <String, Object>{};
-      var dict8 = <String, Object>{};
-      var dict9 = <String, Object>{};
+      final dict1 = <String, Object>{};
+      final dict2 = <String, Object>{};
+      final dict3 = <String, Object>{};
+      final dict4 = <String, Object>{};
+      final dict5 = <String, Object>{};
+      final dict6 = <String, Object>{};
+      final dict7 = <String, Object>{};
+      final dict8 = <String, Object>{};
+      final dict9 = <String, Object>{};
 
       dict1['Data'] = dict2;
       dict2['Data2'] = dict3;
@@ -529,21 +558,21 @@ void main() {
       dict7['Data7'] = dict8;
       dict8['Data8'] = dict9;
 
-      var b = _string('The quick brown fox jumps over the lazy dog. '
+      final b = _string('The quick brown fox jumps over the lazy dog. '
           'Elephants and sheep are visually quite different.');
-      var s = Base64Encoder().convert(b.buffer.asUint8List());
+      final s = const Base64Encoder().convert(b.buffer.asUint8List());
       dict9['Data9'] = _string(s);
 
-      var p = XMLPropertyListWriter(dict1);
-      var result = p.write();
+      final p = XMLPropertyListWriter(dict1);
+      final result = p.write();
       expect(result, equals(template));
     });
   });
 }
 
 ByteData _string(String text) {
-  var list = text.codeUnits;
-  var ulist = Uint8List.fromList(list);
-  var buffer = ulist.buffer;
+  final list = text.codeUnits;
+  final ulist = Uint8List.fromList(list);
+  final buffer = ulist.buffer;
   return ByteData.view(buffer);
 }

@@ -1,8 +1,8 @@
 // dateutil_test.dart
 // PropertyListSerialization Copyright © 2021; Electric Bolt Limited.
 
-import 'package:test/test.dart';
 import 'package:propertylistserialization/src/dateutil.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('parseBinary', () {
@@ -16,8 +16,7 @@ void main() {
   });
 
   test('formatBinary', () {
-    var date = DateTime.utc(2018, DateTime.march, 19, 23,
-        58, 47);
+    var date = DateTime.utc(2018, DateTime.march, 19, 23, 58, 47);
     var val = formatBinary(date);
     expect(val, equals(5.43196727E8));
 
@@ -28,7 +27,7 @@ void main() {
 
   test('parseXML', () {
     var date = parseXML('2018-03-19T23:58:47Z');
-    expect(date, equals(DateTime.utc(2018, DateTime.march, 19, 23, 58,47)));
+    expect(date, equals(DateTime.utc(2018, DateTime.march, 19, 23, 58, 47)));
 
     date = parseXML('1970-01-01T00:00:00Z');
     expect(date, equals(DateTime.utc(1970, DateTime.january, 1, 0, 0, 0)));
