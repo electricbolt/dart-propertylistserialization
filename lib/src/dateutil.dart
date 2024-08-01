@@ -3,7 +3,6 @@
 
 /// Binary plist dates have an epoch of 01 January 2001. Parameter [d] date in
 /// milliseconds from epoch. Returns a [DateTime].
-
 DateTime parseBinary(double d) {
   final binaryPlistEpoch = DateTime.utc(2001, DateTime.january, 1);
   return binaryPlistEpoch.add(Duration(seconds: d.toInt()));
@@ -48,8 +47,9 @@ String _formatTwoDigits(int n) {
 }
 
 String formatXML(DateTime d) {
-  final year = (d.year >= -9999 && d.year <= 9999) ? _formatFourDigits(d.year) :
-    _formatSixDigits(d.year);
+  final year = (d.year >= -9999 && d.year <= 9999)
+      ? _formatFourDigits(d.year)
+      : _formatSixDigits(d.year);
   final month = _formatTwoDigits(d.month);
   final day = _formatTwoDigits(d.day);
   final hour = _formatTwoDigits(d.hour);

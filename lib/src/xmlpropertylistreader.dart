@@ -9,14 +9,15 @@ import 'package:propertylistserialization/src/dateutil.dart';
 import 'package:xml/xml_events.dart';
 
 class XMLPropertyListReader {
-
   final String _plist;
   late Iterator<XmlEvent> _events;
   XmlEvent? _pushbackEvent;
   late int _logIndent = 0;
   final bool _logging = false;
 
-  XMLPropertyListReader(String plist) : _plist = plist, _pushbackEvent = null;
+  XMLPropertyListReader(String plist)
+      : _plist = plist,
+        _pushbackEvent = null;
 
   Object parse() {
     _events = parseEvents(_plist).iterator;
@@ -30,7 +31,9 @@ class XMLPropertyListReader {
     _logStart('<plist>');
     final event = _nextEventSkipOptionalText();
     if (event is! XmlStartElementEvent) {
-      throw _expected(event, 'XmlStartElementEvent (array,dict,string,data,'
+      throw _expected(
+          event,
+          'XmlStartElementEvent (array,dict,string,data,'
           'date,integer,real,true,false)');
     }
     final result = _readObject(event);
@@ -40,7 +43,7 @@ class XMLPropertyListReader {
   }
 
   Object _readObject(XmlStartElementEvent event) {
-    switch(event.name) {
+    switch (event.name) {
       case 'array':
         return _readArray(event.isSelfClosing);
       case 'dict':
@@ -93,7 +96,9 @@ class XMLPropertyListReader {
     var event = _nextEventSkipOptionalText();
     while (event is! XmlEndElementEvent) {
       if (event is! XmlStartElementEvent) {
-        throw _expected(event, 'XmlStartElementEvent (array,dict,string,data,'
+        throw _expected(
+            event,
+            'XmlStartElementEvent (array,dict,string,data,'
             'date,integer,real,true,false)');
       }
       list.add(_readObject(event));
@@ -129,13 +134,15 @@ class XMLPropertyListReader {
       if (event is! XmlTextEvent) {
         throw _expected(event, 'XmlTextEvent');
       }
-      final key = event.text; // key: always a string
+      final key = event.value; // key: always a string
       _requireEndElement('key');
       _log('<key>$key</key>');
       // Read value
       event = _nextEvent();
       if (event is! XmlStartElementEvent) {
-        throw _expected(event, 'XmlStartElementEvent (array,dict,string,data,'
+        throw _expected(
+            event,
+            'XmlStartElementEvent (array,dict,string,data,'
             'date,integer,real,true,false)');
       }
       dict[key] = _readObject(event);
@@ -168,7 +175,7 @@ class XMLPropertyListReader {
 
       // Remove any whitespace from the entire string (including interior
       // characters). The result should be a single line Base64 string.
-      sb.write(event.text.replaceAll(RegExp(r'\s+'), ''));
+      sb.write(event.value.replaceAll(RegExp(r'\s+'), ''));
       event = _nextEvent();
     }
 
@@ -198,7 +205,7 @@ class XMLPropertyListReader {
       if (event is! XmlTextEvent) {
         throw _expected(event, 'XmlTextEvent');
       }
-      final result = event.text.trim();
+      final result = event.value.trim();
       _requireEndElement(tagName);
       _log('<$tagName>$result</$tagName>');
       return result;
@@ -246,7 +253,9 @@ class XMLPropertyListReader {
   void _requireDoctype() {
     final event = _nextEvent();
     if (event is! XmlDoctypeEvent) {
-      throw _expected(event, '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//'
+      throw _expected(
+          event,
+          '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//'
           'EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">');
     }
     _skipOptionalText();
@@ -351,5 +360,4 @@ class XMLPropertyListReader {
       print(''.padLeft(_logIndent) + text);
     }
   }
-
 }

@@ -147,13 +147,10 @@ class XMLPropertyListWriter {
       switch (c) {
         case '<':
           sb.write('&lt;');
-          break;
         case '>':
           sb.write('&gt;');
-          break;
         case '&':
           sb.write('&amp;');
-          break;
         default:
           sb.write(c);
       }

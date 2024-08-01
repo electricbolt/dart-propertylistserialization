@@ -1,3 +1,6 @@
+#### 1.4.0
+- Updated dependencies in pubspec.yaml.
+
 #### 1.3.0
 - Added additional unit-test for binary property list deserialization.
 - Updated dependencies in pubspec.yaml.
