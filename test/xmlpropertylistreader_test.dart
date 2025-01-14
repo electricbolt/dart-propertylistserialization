@@ -395,6 +395,7 @@ void main() {
 	<!-- test -->
 	<key>com.apple.security.app-sandbox</key>
   <!-- Hello! -->
+  <!-- And another comment -->
 	<true/>
   <!-- 
     A multiline comment
