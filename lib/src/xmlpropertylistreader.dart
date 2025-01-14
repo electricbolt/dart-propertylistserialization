@@ -29,7 +29,7 @@ class XMLPropertyListReader {
     _requireDoctype();
     _requireStartElement('plist');
     _logStart('<plist>');
-    final event = _nextEventsSkipOptionalText();
+    final event = _nextEventSkipOptionalTexts();
     if (event is! XmlStartElementEvent) {
       throw _expected(
           event,
@@ -93,7 +93,7 @@ class XMLPropertyListReader {
       return list;
     }
     _logStart('<array>');
-    var event = _nextEventsSkipOptionalText();
+    var event = _nextEventSkipOptionalTexts();
     while (event is! XmlEndElementEvent) {
       if (event is! XmlStartElementEvent) {
         throw _expected(
@@ -102,7 +102,7 @@ class XMLPropertyListReader {
             'date,integer,real,true,false)');
       }
       list.add(_readObject(event));
-      event = _nextEventsSkipOptionalText();
+      event = _nextEventSkipOptionalTexts();
     }
     _logEnd('</array>');
     return list;
@@ -124,7 +124,7 @@ class XMLPropertyListReader {
       return dict;
     }
     _logStart('<dict>');
-    var event = _nextEventsSkipOptionalText();
+    var event = _nextEventSkipOptionalTexts();
     while (event is! XmlEndElementEvent) {
       // Read key
       if (event is! XmlStartElementEvent || (event.name != 'key')) {
@@ -138,7 +138,7 @@ class XMLPropertyListReader {
       _requireEndElement('key');
       _log('<key>$key</key>');
       // Read value
-      event = _nextEvent();
+      event = _nextEventSkipOptionalTexts();
       if (event is! XmlStartElementEvent) {
         throw _expected(
             event,
@@ -146,7 +146,7 @@ class XMLPropertyListReader {
             'date,integer,real,true,false)');
       }
       dict[key] = _readObject(event);
-      event = _nextEventsSkipOptionalText();
+      event = _nextEventSkipOptionalTexts();
     }
     _logEnd('</dict>');
     return dict;
@@ -226,7 +226,7 @@ class XMLPropertyListReader {
   /// e.g. `<string>` where `string` is the [tagName] value.
 
   void _requireStartElement(String tagName) {
-    final event = _nextEventsSkipOptionalText();
+    final event = _nextEventSkipOptionalTexts();
     if (event is! XmlStartElementEvent || event.name != tagName) {
       throw _expected(event, tagName);
     }
@@ -238,7 +238,7 @@ class XMLPropertyListReader {
   /// e.g. </string> where `string` is the [tagName] value.
 
   void _requireEndElement(String tagName, {bool skipOptionalText = false}) {
-    final event = _nextEventsSkipOptionalText();
+    final event = _nextEventSkipOptionalTexts();
     if (event is! XmlEndElementEvent || event.name != tagName) {
       throw _expected(event, tagName);
     }
@@ -287,7 +287,7 @@ class XMLPropertyListReader {
   /// Throws a [PropertyListReadStreamException] if the end of the xml stream is
   /// encountered.
 
-  XmlEvent _nextEventsSkipOptionalText() {
+  XmlEvent _nextEventSkipOptionalTexts() {
     var event = _nextEvent();
     while (event is XmlTextEvent) {
       event = _nextEvent();

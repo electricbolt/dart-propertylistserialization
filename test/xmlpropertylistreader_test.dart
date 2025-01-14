@@ -394,6 +394,7 @@ void main() {
 <dict>
 	<!-- test -->
 	<key>com.apple.security.app-sandbox</key>
+  <!-- Hello! -->
 	<true/>
   <!-- 
     A multiline comment
