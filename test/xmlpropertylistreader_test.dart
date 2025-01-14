@@ -385,5 +385,30 @@ void main() {
       final o = p.parse() as String;
       expect(o, equals('My string\twith a tab'));
     });
+
+    test('comments', () {
+      const plistXml = '''
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- test -->
+	<key>com.apple.security.app-sandbox</key>
+  <!-- Hello! -->
+	<true/>
+  <!-- 
+    A multiline comment
+    Here's another line
+  -->
+	<key>com.apple.security.network.server</key>
+	<true/>
+</dict>
+</plist>''';
+      final plist = XMLPropertyListReader(plistXml);
+      final map = plist.parse() as Map<String, Object>;
+      expect(map, hasLength(2));
+      expect(map['com.apple.security.app-sandbox'], equals(true));
+      expect(map['com.apple.security.network.server'], equals(true));
+    });
   });
 }
