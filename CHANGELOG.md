@@ -1,3 +1,6 @@
+### 1.5.0
+- Updated dependencies in pubspec.yaml.
+
 #### 1.4.1
 - Bug fix to handle multi line comments (PR#5).
 - Updated dependencies in pubspec.yaml. 
